@@ -1,60 +1,59 @@
+import { useAuth } from '../hooks/useAuth'
+import { useState } from 'react'
+import { useForm, Controller } from 'react-hook-form'
+import { InputText } from 'primereact/inputtext'
+import { Button } from 'primereact/button'
+import { Calendar } from 'primereact/calendar'
+import { Password } from 'primereact/password'
+import { Checkbox, CheckboxChangeEvent } from 'primereact/checkbox'
+import { Dialog } from 'primereact/dialog'
+import { Divider } from 'primereact/divider'
+import { classNames } from 'primereact/utils'
+import '../css/Form.css'
+import { useNavigate, Link } from 'react-router-dom'
+import { SingupData } from '../types'
 
-import { useState } from 'react';
-import { useForm, Controller } from 'react-hook-form';
-import { InputText } from 'primereact/inputtext';
-import { Button } from 'primereact/button';
-import { Calendar } from 'primereact/calendar';
-import { Password } from 'primereact/password';
-import { Checkbox, CheckboxChangeEvent } from 'primereact/checkbox';
-import { Dialog } from 'primereact/dialog';
-import { Divider } from 'primereact/divider';
-import { classNames } from 'primereact/utils';
-import '../css/Form.css';
-import { useNavigate } from 'react-router-dom';
+type FormData = SingupData & { confirmPassword: string, accept: boolean }
 
-type FormData = {
-    firstName: string,
-    lastName: string,
-    email: string,
-    password: string,
-    confirmPassword: string,
-    date: Date,
-    accept: boolean
-}
-
-type FormErrorMessageProps = 'firstName' | 'lastName' | 'email' | 'password' | 'confirmPassword' | 'accept'
-
+type FormProps = 'firstName' | 'lastName' | 'email' | 'password' | 'confirmPassword' | 'accept'
 
 export default function Singup() {
     const navigate = useNavigate();
-    const [showMessage, setShowMessage] = useState(false);
+    const [showMessage, setShowMessage] = useState(false)
+    const [showErorrMessage, setShowErorrMessage] = useState(false)
     const defaultValues: FormData = {
         firstName: '',
         lastName: '',
         email: '',
         password: '',
         confirmPassword: '',
-        date: new Date('1995-01-01'),
+        birthday: new Date('1995-01-01'),
         accept: false
     }
-    const [formData, setFormData] = useState(defaultValues);
+    const [formData, setFormData] = useState(defaultValues)
+    const { singup } = useAuth()!
 
+    const { control, formState: { errors }, handleSubmit, reset, watch } = useForm({ defaultValues })
 
-    const { control, formState: { errors }, handleSubmit, reset, watch } = useForm({ defaultValues });
+    const onSubmit = async (data: FormData) => {
+        setFormData(data)
+        const res = await singup(data)
+        if (res) {
+            setShowMessage(true)
+            navigate('/')
+            reset()
+        }
+        else {
+            setShowErorrMessage(true)
+        }
+    }
 
-    const onSubmit = (data: FormData) => {
-        setFormData(data);
-        setShowMessage(true);
-        navigate('/about');
-        reset();
-    };
-
-    const getFormErrorMessage = (name: FormErrorMessageProps) => {
+    const getFormErrorMessage = (name: FormProps) => {
         return errors[name] && <small className="p-error">{errors[name]?.message}</small>
     };
 
-    const dialogFooter = <div className="flex justify-content-center"><Button label="OK" className="p-button-text" autoFocus onClick={() => setShowMessage(false)} /></div>;
-    const passwordHeader = <h6>Pick a password</h6>;
+    const dialogFooter = <div className="flex justify-content-center"><Button label="OK" className="p-button-text" autoFocus onClick={() => setShowMessage(false)} /></div>
+    const passwordHeader = <h6>Pick a password</h6>
     const passwordFooter = (
         <>
             <Divider />
@@ -66,7 +65,7 @@ export default function Singup() {
                 <li>Minimum 8 characters</li>
             </ul>
         </>
-    );
+    )
 
     return (
         <div className="form-demo">
@@ -76,6 +75,16 @@ export default function Singup() {
                     <h5>Registration Successful!</h5>
                     <p style={{ lineHeight: 1.5, textIndent: '1rem' }}>
                         Your account is registered under name <b>{`${formData.firstName} ${formData.lastName}`}</b> ; it'll be valid next 30 days without activation. Please check <b>{formData.email}</b> for activation instructions.
+                    </p>
+                </div>
+            </Dialog>
+
+            <Dialog visible={showErorrMessage} onHide={() => setShowErorrMessage(false)} position="top" footer={dialogFooter} showHeader={false} breakpoints={{ '960px': '80vw' }} style={{ width: '30vw' }}>
+                <div className="flex justify-content-center flex-column pt-6 px-3">
+                    <i className="pi pi-check-circle" style={{ fontSize: '5rem', color: 'var(--green-500)' }}></i>
+                    <h5>Registration Faild 😰</h5>
+                    <p style={{ lineHeight: 1.5, textIndent: '1rem' }}>
+                        please try agein later
                     </p>
                 </div>
             </Dialog>
@@ -132,7 +141,7 @@ export default function Singup() {
                                         }
                                     }
                                 }} render={({ field, fieldState }) => (
-                                    <Password feedback={false} id={field.name} {...field} toggleMask className={classNames({ 'p-invalid': fieldState.invalid })} />
+                                    <Password feedback={false} id={field.name} {...field} className={classNames({ 'p-invalid': fieldState.invalid })} />
                                 )} />
                                 <label htmlFor="confirmPassword" className={classNames({ 'p-error': errors.password })}>Confirm Password*</label>
                             </span>
@@ -140,10 +149,10 @@ export default function Singup() {
                         </div>
                         <div className="field">
                             <span className="p-float-label">
-                                <Controller name="date" control={control} render={({ field }) => (
+                                <Controller name="birthday" control={control} render={({ field }) => (
                                     <Calendar id={field.name} value={field.value} onChange={(e: CheckboxChangeEvent) => field.onChange(e.value)} dateFormat="dd/mm/yy" mask="99/99/9999" showIcon />
                                 )} />
-                                <label htmlFor="date">Birthday</label>
+                                <label htmlFor="birthday">Birthday</label>
                             </span>
                         </div>
                         <div className="field-checkbox">
@@ -153,10 +162,11 @@ export default function Singup() {
                             <label htmlFor="accept" className={classNames({ 'p-error': errors.accept })}>I agree to the terms and conditions*</label>
                         </div>
 
-                        <Button type="submit" label="Submit" className="mt-2" />
+                        <Button type="submit" label="Singup" className="mt-2" />
                     </form>
+                    <Link to="/" className="p-d-block p-text-center mt-2">Already have an account?</Link>
                 </div>
             </div>
         </div>
-    );
+    )
 }

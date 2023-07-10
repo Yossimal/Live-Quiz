@@ -14,10 +14,14 @@ const prisma = new PrismaClient()
 
 const router = express.Router()
 
+type UserTokenData = { id: number, email: string }
 
-function generateAccessToken(user: User) {
-    const { id, email } = user
-    const accessToken = jwt.sign({ id, email }, process.env.ACCESS_TOKEN_SECRET!, { expiresIn: '10s' })
+function getTokenData<T extends UserTokenData>({ id, email }: T): UserTokenData {
+    return { id, email }
+}
+
+function generateAccessToken<T extends UserTokenData>(user: T) {
+    const accessToken = jwt.sign(getTokenData(user), process.env.ACCESS_TOKEN_SECRET!, { expiresIn: '10s' })
     return accessToken
 }
 
@@ -36,7 +40,7 @@ router.post('/login', v.loginValidation, async (req, res) => {
     }
 
     const accessToken = generateAccessToken(user)
-    const refreshToken = jwt.sign({ email }, process.env.REFRESH_TOKEN_SECRET!)
+    const refreshToken = jwt.sign(getTokenData(user), process.env.REFRESH_TOKEN_SECRET!)
 
     addToken(email, refreshToken)
 
@@ -45,16 +49,15 @@ router.post('/login', v.loginValidation, async (req, res) => {
 });
 
 router.post('/token', v.tokenValidation, async (req, res) => {
-    const auth = res.locals.auth as v.TokenData
+    const auth = res.locals.auth as v.RefreshTokenData
     console.log(auth)
     const token = await getToken(auth.email)
-    if (token !== auth.token) return res.sendStatus(403)
-    // if (!refreshTokens.includes(res.locals.token)) return res.sendStatus(403);
+    if (token !== auth.token) return res.sendStatus(403) // potential security issue
 
-    jwt.verify(auth.token, process.env.REFRESH_TOKEN_SECRET!, (err: any, user: any) => {
+    jwt.verify(auth.token, process.env.REFRESH_TOKEN_SECRET!, (err: any, user: unknown) => {
         if (err) return res.sendStatus(403)
 
-        const accessToken = generateAccessToken(user)
+        const accessToken = generateAccessToken(user as UserTokenData)
 
         res.send({ accessToken })
     });
@@ -67,7 +70,7 @@ router.delete('/logout/:email', v.logoutValidation, (req, res) => {
 });
 
 router.post('/singup', v.singupValidation, async (req, res) => {
-    const { firstName, lastName, email, password } = res.locals.singupValues as v.SingupData
+    const { firstName, lastName, email, password, birthday } = res.locals.singupValues as v.SingupData
     const hase = hasePassword(password)
     try {
         const user = await prisma.user.create({
@@ -75,7 +78,7 @@ router.post('/singup', v.singupValidation, async (req, res) => {
                 firstName,
                 lastName,
                 email,
-
+                birthday,
                 password: hase
             }
         });
