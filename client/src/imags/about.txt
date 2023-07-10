@@ -1,0 +1,6 @@
+This favicon was generated using the following font:
+
+- Font Title: Oooh Baby
+- Font Author: Copyright 2004-2021 The Oooh Baby Project Authors (https://github.com/googlefonts/oooh-baby)
+- Font Source: http://fonts.gstatic.com/s/ooohbaby/v4/2sDcZGJWgJTT2Jf76xQDb2-4C7wFZQ.ttf
+- Font License: SIL Open Font License, 1.1 (http://scripts.sil.org/OFL))
