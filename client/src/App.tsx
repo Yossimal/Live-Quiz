@@ -15,6 +15,7 @@ export default function App() {
           <Routes>
             <Route path="/" element={<Login />} />
             <Route path="/signup" element={<Singup />} />
+            <Route path="/varifyEmail/:token" element={<VarifyEmail />} />
             <Route path="/about" element={<h1>About</h1>} />
           </Routes>
         </BrowserRouter>

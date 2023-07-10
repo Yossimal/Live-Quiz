@@ -126,30 +126,57 @@ router.post("/singup", v.singupValidation, async (req, res) => {
   }
 });
 
+router.post("/varifyEmail", v.emailVarificationValidation, async (req, res) => {
+  const token: string = res.locals.token;
+  try {
+    const tokenData = await prisma.emailValidationTokens.findFirst({
+      where: {
+        token,
+      },
+    });
+    if (!tokenData) {
+      res.status(404).send({ error: "Token not found" });
+      return;
+    }
+    //if the token is expired -> send new token
+    if (tokenData.expiresAt < new Date()) {
+      const user = await prisma.user.findUnique({
+        where: {
+          id: tokenData.userId,
+        },
+      });
+      if (!user) {
+        res.status(404).send({ error: "User not found" });
+        return;
+      }
 
-res.send(user)
+      sendVarificationEmail(user);
+      res.status(400).send({ error: "Token expired" });
     }
     //if the token is valid -> update user
     else {
-  const user = await prisma.user.update({
-    where: {
-      id: tokenData.userId,
-    },
-    data: {
-      varified: true,
-    },
-    select: {
-      varified: true,
-    },
-  });
-  console.log(user);
-  res.send({ ok: true });
-}
-  } catch (err: PrismaClientKnownRequestError | any) {
-  const prismaError = err as PrismaClientKnownRequestError;
-  if (prismaError?.code === "P2002") {
-    res.status(400).send({ error: "Email already exists" });
-  } else {
-    res.status(500).send({ error: "Something went wrong" });
+      const user = await prisma.user.update({
+        where: {
+          id: tokenData.userId,
+        },
+        data: {
+          varified: true,
+        },
+        select: {
+          varified: true,
+        },
+      });
+      console.log(user);
+      res.send({ ok: true });
+    }
+  } catch (err: PrismaClientKnownRequestError | unknown) {
+    const prismaError = err as PrismaClientKnownRequestError;
+    if (prismaError?.code === "P2002") {
+      res.status(400).send({ error: "Email already exists" });
+    } else {
+      res.status(500).send({ error: "Something went wrong" });
+    }
   }
-})
+});
+
+export default router;
