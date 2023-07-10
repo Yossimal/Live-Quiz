@@ -1,12 +1,11 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom"
-import { QueryClient, QueryClientProvider } from "react-query"
-import { AuthProvider } from './contexts/AuthProvider'
-import Login from "./pages/Login"
-import Singup from "./pages/Singup"
-import Home from "./pages/Home"
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "react-query";
+import { AuthProvider } from "./contexts/AuthProvider";
+import Login from "./pages/Login";
+import Singup from "./pages/Singup";
+import VarifyEmail from "./pages/VarifyEmail";
 
-const queryClient = new QueryClient()
-
+const queryClient = new QueryClient();
 
 export default function App() {
   return (
@@ -16,10 +15,10 @@ export default function App() {
           <Routes>
             <Route path="/" element={<Login />} />
             <Route path="/signup" element={<Singup />} />
-            <Route path="/home" element={<Home />} />
+            <Route path="/about" element={<h1>About</h1>} />
           </Routes>
         </BrowserRouter>
       </AuthProvider>
     </QueryClientProvider>
-  )
+  );
 }

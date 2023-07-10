@@ -23,6 +23,7 @@ enum MediaType {
 
 model User {
   id        Int       @id @default(autoincrement())
+  varified  Boolean   @default(false)
   email     String    @unique
   firstName String?
   lastName  String?
@@ -91,7 +92,7 @@ model EmailValidationTokens {
   id        Int      @id @default(autoincrement())
   userId    Int
   token     String   @unique @default(uuid())
-  expiresAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP + INTERVAL 1 DAY"))
+  expiresAt DateTime @default(dbgenerated("(CURRENT_TIMESTAMP + INTERVAL 1 DAY)"))
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -100,7 +101,7 @@ model PasswordResetTokens {
   id        Int      @id @default(autoincrement())
   userId    Int
   token     String   @unique @default(uuid())
-  expiresAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP + INTERVAL 5 MINUTE"))
+  expiresAt DateTime @default(dbgenerated("(CURRENT_TIMESTAMP + INTERVAL 5 MINUTE)"))
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
