@@ -1,6 +1,5 @@
 import z, { ZodError } from "zod";
 import { Request, Response, NextFunction } from "express";
-import { type } from "os";
 
 const singupSchema = z.object({
   firstName: z.string().min(3),

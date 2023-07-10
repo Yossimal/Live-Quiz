@@ -116,7 +116,7 @@ router.post("/singup", v.singupValidation, async (req, res) => {
     sendVarificationEmail(user);
 
     res.send(user);
-  } catch (err: PrismaClientKnownRequestError | any) {
+  } catch (err: PrismaClientKnownRequestError | unknown) {
     const prismaError = err as PrismaClientKnownRequestError;
     if (prismaError?.code === "P2002") {
       res.status(400).send({ error: "Email already exists" });
