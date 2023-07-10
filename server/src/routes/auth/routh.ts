@@ -27,6 +27,7 @@ function generateAccessToken<T extends UserTokenData>(user: T) {
 
 router.post('/login', v.loginValidation, async (req, res) => {
     const { email, password } = res.locals.loginValues as v.LoginData
+    console.log(email, password)
     const user = await prisma.user.findUnique({
         where: {
             email
@@ -83,7 +84,7 @@ router.post('/singup', v.singupValidation, async (req, res) => {
             }
         });
 
-        
+
         res.send(user)
     }
     catch (err: PrismaClientKnownRequestError | any) {
@@ -95,6 +96,11 @@ router.post('/singup', v.singupValidation, async (req, res) => {
             res.status(500).send({ error: 'Something went wrong' })
         }
     }
+})
+
+router.get('/users', async (req, res) => {
+    const users = await prisma.user.findMany()
+    res.send(users)
 })
 
 export default router
