@@ -15,6 +15,10 @@
     "typescript": "^5.1.6",
     "zod": "^3.21.4"
   },
+  "scripts": {
+    "start": "rm -rf dist/ && tsc --project . && node dist/server.js",
+    "dev": "nodemon ."
+  },
   "dependencies": {
     "@prisma/client": "^4.16.2",
     "@types/cors": "^2.8.13",

@@ -82,6 +82,8 @@ router.post('/singup', v.singupValidation, async (req, res) => {
                 password: hase
             }
         });
+
+        
         res.send(user)
     }
     catch (err: PrismaClientKnownRequestError | any) {
