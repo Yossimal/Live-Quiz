@@ -63,6 +63,10 @@ router.post("/login", v.loginValidation, async (req, res) => {
   if (!verifyPassword(password, user.password)) {
     return res.status(403).send({ error: "Invalid email or password" });
   }
+  if (!user.varified) {
+    await sendVarificationEmail(user);
+    return res.status(403).send({ error: "Email not varified" });
+  }
 
   const accessToken = generateAccessToken(user);
   const refreshToken = jwt.sign(
@@ -135,8 +139,7 @@ router.post("/varifyEmail", v.emailVarificationValidation, async (req, res) => {
       },
     });
     if (!tokenData) {
-      res.status(404).send({ error: "Token not found" });
-      return;
+      return res.status(404).send({ error: "Token not found" });
     }
     //if the token is expired -> send new token
     if (tokenData.expiresAt < new Date()) {
@@ -146,35 +149,32 @@ router.post("/varifyEmail", v.emailVarificationValidation, async (req, res) => {
         },
       });
       if (!user) {
-        res.status(404).send({ error: "User not found" });
-        return;
+        return res.status(404).send({ error: "User not found" });
       }
 
       sendVarificationEmail(user);
-      res.status(400).send({ error: "Token expired" });
+      return res.status(400).send({ error: "Token expired" });
     }
     //if the token is valid -> update user
-    else {
-      const user = await prisma.user.update({
-        where: {
-          id: tokenData.userId,
-        },
-        data: {
-          varified: true,
-        },
-        select: {
-          varified: true,
-        },
-      });
-      console.log(user);
-      res.send({ ok: true });
-    }
+    const user = await prisma.user.update({
+      where: {
+        id: tokenData.userId,
+      },
+      data: {
+        varified: true,
+      },
+      select: {
+        varified: true,
+      },
+    });
+    console.log(user);
+    return res.status(200).send({ ok: true });
   } catch (err: PrismaClientKnownRequestError | any) {
     const prismaError = err as PrismaClientKnownRequestError;
     if (prismaError?.code === "P2002") {
-      res.status(400).send({ error: "Email already exists" });
+      return res.status(400).send({ error: "Email already exists" });
     } else {
-      res.status(500).send({ error: "Something went wrong" });
+      return res.status(500).send({ error: "Something went wrong" });
     }
   }
 });
