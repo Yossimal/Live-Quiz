@@ -40,12 +40,12 @@ export function loginValidation(
     res.locals.loginValues = loginValues as LoginData;
     next();
   } catch (error: ZodError | unknown) {
+    //TODO :: send clear string to the end user with the error!!!!!!!!!!
     res.status(400).send({ error: (error as ZodError).errors });
   }
 }
 
 const tokenSchema = z.object({
-  email: z.string().email(),
   token: z.string(),
 });
 export type RefreshTokenData = z.infer<typeof tokenSchema>;
@@ -60,13 +60,16 @@ export function tokenValidation(
     res.locals.auth = auth as RefreshTokenData;
     next();
   } catch (error: ZodError | unknown) {
-    res.status(400).send({ error: (error as ZodError).errors });
+    res.status(400).send({ error: "Invalid refresh token!" });
   }
 }
 
 const logoutSchema = z.object({
-  email: z.string().email(),
+  accessToken: z.string(),
+  refreshToken: z.string(),
 });
+
+export type LogoutData = z.infer<typeof logoutSchema>;
 
 export function logoutValidation(
   req: Request,
@@ -74,11 +77,21 @@ export function logoutValidation(
   next: NextFunction
 ) {
   try {
-    const email = logoutSchema.parse(req.params);
-    res.locals.email = email.email;
+    const tokens = logoutSchema.parse(req.body);
+    res.locals.accessToken = tokens.accessToken;
+    res.locals.refreshToken = tokens.refreshToken;
     next();
   } catch (error: ZodError | unknown) {
-    res.status(400).send({ error: (error as ZodError).errors });
+    //TODO :: send clear string to the end user with the error!!!!!!!!!!
+    if (error instanceof ZodError) {
+      if (error.errors[0].path[0] === "accessToken") {
+        return res.status(400).send({ error: "Invalid access token!" });
+      }
+      if (error.errors[0].path[0] === "refreshToken") {
+        return res.status(400).send({ error: "Invalid refresh token!" });
+      }
+    }
+    res.status(500).send({ error: "An unexpected error occured" });
   }
 }
 
@@ -92,6 +105,9 @@ export function emailVarificationValidation(
     res.locals.token = token;
     next();
   } catch (error: ZodError | unknown) {
-    res.status(400).send({ error: (error as ZodError).errors });
+    res.status(400).send({
+      error:
+        "There was an error in the token, try to login again to get new token.",
+    });
   }
 }

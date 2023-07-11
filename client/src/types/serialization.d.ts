@@ -1,0 +1,1 @@
+export type Serializiation<T> = [(t:T)=>unknown,(u:unknown)=>T];

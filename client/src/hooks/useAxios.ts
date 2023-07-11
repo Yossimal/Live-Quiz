@@ -1,5 +1,5 @@
 import axios, { AxiosInstance } from "axios";
-import { useAuth } from "./useAuth";
+import { useAuth } from "./authHooks";
 import { useState } from "react";
 
 export function useAxios() {
