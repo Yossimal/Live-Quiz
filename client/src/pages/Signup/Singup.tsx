@@ -1,4 +1,4 @@
-import { useAuth } from '../hooks/useAuth'
+import { useAuth } from '../../hooks/useAuth'
 import { useState } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { InputText } from 'primereact/inputtext'
@@ -11,7 +11,7 @@ import { Divider } from 'primereact/divider'
 import { classNames } from 'primereact/utils'
 import '../css/Form.css'
 import { useNavigate, Link } from 'react-router-dom'
-import { SingupData } from '../types'
+import { SingupData } from '../../types'
 
 type FormData = SingupData & { confirmPassword: string, accept: boolean }
 

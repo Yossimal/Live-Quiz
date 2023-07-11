@@ -8,8 +8,8 @@ import { Dialog } from 'primereact/dialog'
 import { classNames } from 'primereact/utils';
 import '../css/Form.css';
 import { useNavigate, Link } from 'react-router-dom'
-import { useAuth } from '../hooks/useAuth'
-import { LoginMutation } from '../types'
+import { useAuth } from '../../hooks/useAuth'
+import { LoginMutation } from '../../types'
 
 type FormData = LoginMutation & { remember: boolean }
 
