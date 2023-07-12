@@ -5,7 +5,7 @@ import { PrismaClient } from "@prisma/client";
 import { User } from "@prisma/client";
 import { hasePassword, verifyPassword } from "./safePassword";
 import * as v from "./validation";
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import {
   deleteAcessToken,
   deleteRefreshToken,
@@ -89,25 +89,21 @@ router.post("/login", v.loginValidation, async (req, res) => {
 
 router.post("/token", v.tokenValidation, async (req, res) => {
   const auth = res.locals.auth as v.RefreshTokenData;
-
-  // const token = await getToken(auth.email);
   const refreshToken = auth.token;
-  if (refreshToken !== auth.token) return res.sendStatus(403); // potential security issue
-  const accessToken = refreshAccessToken(refreshToken);
+  const accessToken = await refreshAccessToken(refreshToken);
   if (!accessToken) return res.status(403).send({ error: "Invalid token" });
   res.send({ accessToken });
 });
 
 //WE DONT WANT TO SEND THE EMAIL IN THE REQUEST BECAUSE WE HAVE JWT!!!!
 router.post("/logout", v.logoutValidation, (req, res) => {
-  // refreshTokens = refreshTokens.filter(token => token !== res.locals.token);
   const tokens = res.locals.tokens as v.LogoutData;
   deleteAcessToken(tokens.accessToken);
   deleteRefreshToken(tokens.refreshToken);
   res.sendStatus(204);
 });
 
-router.post("/singup", v.singupValidation, async (req, res) => {
+router.post("/signup", v.singupValidation, async (req, res) => {
   const { firstName, lastName, email, password, birthday } = res.locals
     .singupValues as v.SingupData;
   const hase = hasePassword(password);

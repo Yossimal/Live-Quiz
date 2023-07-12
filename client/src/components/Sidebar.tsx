@@ -1,9 +1,10 @@
 import { PanelMenu } from 'primereact/panelmenu'
 import { MenuItem } from 'primereact/menuitem'
+import { useAuthenticate } from '../hooks/authHooks'
 // import { useAuth } from '../hooks/useAuth'
 
 export default function Sidebar() {
-    // const { logout } = useAuth()!
+    const { logout } = useAuthenticate()
     const items: MenuItem[] = [
         {
             label: 'Quizzes',
@@ -53,7 +54,7 @@ export default function Sidebar() {
             icon: 'pi pi-fw pi-sign-out',
             command: async () => {
                 console.log('logout')
-                // await logout()
+                await logout()
             }
         }
     ]

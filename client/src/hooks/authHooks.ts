@@ -1,7 +1,7 @@
 import { useSession } from "./useSession";
 import userSerializer from "../data/serialization/userSerializer";
 import { UserType } from "../types/dataObjects";
-import axios, { AxiosInstance } from "axios";
+import axios, { Axios, AxiosError, AxiosInstance } from "axios";
 import { LoginMutation, SingupData } from "../types/auth";
 import { LoginResponse } from "../types/api";
 
@@ -26,14 +26,8 @@ export function useAuthenticate() {
     try {
       const res = await authAxiosInstance.post("/login", loginData);
       if (res.status !== 200) {
-        if (res.status === 400) {
-          const error = res.data.error;
-          return error;
-        }
-        if (res.status === 403) {
-          const error = res.data.error;
-          return error;
-        }
+        const error = res.data.error;
+        return error;
       }
       const user = res.data as LoginResponse;
       if (user) {
@@ -48,6 +42,11 @@ export function useAuthenticate() {
       }
       return "An unexpected error occured";
     } catch (err) {
+      if (err instanceof AxiosError
+        && err.response?.data?.error) {
+        const error = err.response.data.error;
+        return error;
+      }
       return "An unexpected error occured";
     }
   };
@@ -76,7 +75,7 @@ export function useAuthenticate() {
     try {
       const res = await authAxiosInstance.post("/logout", {
         refreshToken: user.refreshToken,
-        acessToken: user.accessToken,
+        accessToken: user.accessToken,
       });
       if (res.status !== 204) {
         const error = res.data.error;
@@ -111,7 +110,7 @@ export function useAuthenticate() {
     throw new Error("An unexpected error occured");
   };
 
-  return { login, signup };
+  return { login, signup, logout, refresh };
 }
 
 export function useLogin() {

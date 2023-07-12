@@ -32,7 +32,8 @@ model User {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   role      Role      @default(USER)
-  games     Game[]
+  games     Quiz[]
+  isDeleted Boolean   @default(false)
 
   @@index([email])
 }
@@ -51,31 +52,33 @@ model Question {
   id        Int              @id @default(autoincrement())
   question  String
   options   QuestionOption[]
-  game      Game             @relation(fields: [gameId], references: [id])
-  gameId    Int
+  quiz      Quiz             @relation(fields: [quizId], references: [id])
+  quizId    Int
   media     String?
   mediaType MediaType        @default(NONE)
   createdAt DateTime         @default(now())
   updatedAt DateTime         @updatedAt
+  isDeleted Boolean          @default(false)
 }
 
-model Game {
-  id          Int          @id @default(autoincrement())
-  name        String
-  description String
-  image       String
-  questions   Question[]
-  creatorId   Int
-  creator     User         @relation(fields: [creatorId], references: [id])
-  onlineGames OnlineGame[]
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+model Quiz {
+  id            Int          @id @default(autoincrement())
+  name          String
+  description   String
+  image         String?
+  questions     Question[]
+  creatorId     Int
+  creator       User         @relation(fields: [creatorId], references: [id])
+  onlineQuizzes OnlineQuiz[]
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  isDeleted     Boolean      @default(false)
 }
 
-model OnlineGame {
+model OnlineQuiz {
   id        Int      @id @default(autoincrement())
-  gameId    Int
-  game      Game     @relation(fields: [gameId], references: [id])
+  quizId    Int
+  quiz      Quiz     @relation(fields: [quizId], references: [id])
   players   Player[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -84,8 +87,8 @@ model OnlineGame {
 model Player {
   id     Int        @id @default(autoincrement())
   score  Int
-  gameId Int
-  game   OnlineGame @relation(fields: [gameId], references: [id])
+  quizId Int
+  quiz   OnlineQuiz @relation(fields: [quizId], references: [id])
 }
 
 model EmailValidationTokens {

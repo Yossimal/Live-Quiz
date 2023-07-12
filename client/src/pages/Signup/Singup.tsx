@@ -50,13 +50,13 @@ export default function Singup() {
 
   const onSubmit = async (data: FormData) => {
     setFormData(data);
-    const res = await signup(data);
-    if (res) {
+    const err = await signup(data);
+    if (err) {
+      setShowErorrMessage(true);
+    } else {
       setShowMessage(true);
       navigate("/");
       reset();
-    } else {
-      setShowErorrMessage(true);
     }
   };
 
@@ -72,7 +72,10 @@ export default function Singup() {
         label="OK"
         className="p-button-text"
         autoFocus
-        onClick={() => setShowMessage(false)}
+        onClick={() => {
+          setShowMessage(false);
+          setShowErorrMessage(false);
+        }}
       />
     </div>
   );

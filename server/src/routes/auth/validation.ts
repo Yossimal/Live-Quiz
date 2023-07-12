@@ -19,8 +19,9 @@ export function singupValidation(
     const singupValues = singupSchema.parse(req.body);
     res.locals.singupValues = singupValues as SingupData;
     next();
-  } catch (error: ZodError | any) {
-    res.status(400).send({ error: error.errors });
+  } catch (error: ZodError | unknown) {
+    //TODO :: send clear string to the end user with the error!!!!!!!!!!
+    res.status(400).send({ error: (error as ZodError).errors });
   }
 }
 
@@ -60,7 +61,8 @@ export function tokenValidation(
     res.locals.auth = auth as RefreshTokenData;
     next();
   } catch (error: ZodError | unknown) {
-    res.status(400).send({ error: "Invalid refresh token!" });
+    //TODO :: send clear string to the end user with the error!!!!!!!!!!
+    return res.status(400).send({ error: (error as ZodError).errors });
   }
 }
 
@@ -77,22 +79,24 @@ export function logoutValidation(
   next: NextFunction
 ) {
   try {
-    const tokens = logoutSchema.parse(req.body);
-    res.locals.accessToken = tokens.accessToken;
-    res.locals.refreshToken = tokens.refreshToken;
+    const tokens: LogoutData = logoutSchema.parse(req.body);
+    res.locals.tokens = tokens;
     next();
   } catch (error: ZodError | unknown) {
-    //TODO :: send clear string to the end user with the error!!!!!!!!!!
-    if (error instanceof ZodError) {
-      if (error.errors[0].path[0] === "accessToken") {
-        return res.status(400).send({ error: "Invalid access token!" });
-      }
-      if (error.errors[0].path[0] === "refreshToken") {
-        return res.status(400).send({ error: "Invalid refresh token!" });
-      }
-    }
-    res.status(500).send({ error: "An unexpected error occured" });
+    // //TODO :: send clear string to the end user with the error!!!!!!!!!!
+    // if (error instanceof ZodError) {
+    //   if (error.errors[0].path[0] === "accessToken") {
+    //     return res.status(400).send({ error: "Invalid access token!" });
+    //   }
+    //   if (error.errors[0].path[0] === "refreshToken") {
+    //     return res.status(400).send({ error: "Invalid refresh token!" });
+    //   }
+    // }
+    // res.status(500).send({ error: "An unexpected error occured" });
+
+    return res.status(400).send({ error: (error as ZodError).errors });
   }
+
 }
 
 export function emailVarificationValidation(

@@ -11,7 +11,6 @@ export default function Router() {
       <Route path="/signup" element={<Singup />} />
       <Route path="/varifyEmail/:token" element={<VarifyEmail />} />
       <Route path="/home" element={<Home />} />
-      <Route path="/about" element={<h1>About</h1>} />
     </Routes>
   );
 }

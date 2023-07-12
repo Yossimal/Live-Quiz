@@ -1,10 +1,13 @@
-import Sidebar from "../components/Sidebar";
+import makePrivate from "../../router/makePrivate";
+import Sidebar from "../../components/Sidebar"
 
 
-export default function Home() {
+function Home() {
     return (
         <div>
             <Sidebar />
         </div>
     )
 }
+
+export default makePrivate(Home);

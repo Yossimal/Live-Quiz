@@ -1,12 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { Password } from "primereact/password";
 import { Checkbox } from "primereact/checkbox";
-import { Dialog } from "primereact/dialog";
 import { classNames } from "primereact/utils";
-import "../../css/Form.module.css";
+import { Toast } from "primereact/toast";
+import css from "../../css/Form.module.css";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuthenticate, useCredentials } from "../../hooks/authHooks";
 import { LoginMutation } from "../../types/auth";
@@ -17,16 +17,22 @@ type FormProps = "email" | "password";
 
 export default function Login() {
   const navigate = useNavigate();
-  const [showMessage, setShowMessage] = useState(false);
-  const [submitMessage, setSubmitMessage] = useState("");
+  const toast = useRef<Toast>(null);
+
   const defaultValues: FormData = {
     email: "",
     password: "",
     remember: false,
   };
-  const [formData, setFormData] = useState<FormData>(defaultValues);
-  const { login } = useAuthenticate()!;
+  const { login } = useAuthenticate();
   const user = useCredentials();
+
+  useEffect(() => {
+    if (!user) return;
+    navigate("/home");
+    reset();
+  }, [user]);
+
   const {
     control,
     handleSubmit,
@@ -35,25 +41,20 @@ export default function Login() {
   } = useForm({ defaultValues });
 
   const onSubmit = async (data: FormData) => {
-    setFormData(data);
 
     console.log(data);
     const loginError = await login(data);
     if (loginError) {
-      setSubmitMessage(loginError);
-      setShowMessage(true);
+      showError(loginError);
       return;
     }
-    
+
   };
 
-  useEffect(() => {
-    if (!user) return;
-    setSubmitMessage(`Welcome ${user.firstName} ${user.lastName}!`);
-    setShowMessage(true);
-    navigate("/home");
-    reset();
-  }, [user]);
+  const showError = (message: string) => {
+    if (!toast.current) return;
+    toast.current.show({ severity: 'error', summary: 'Error', detail: message, life: 3000 });
+  }
 
   const getFormErrorMessage = (name: FormProps) => {
     return (
@@ -61,20 +62,10 @@ export default function Login() {
     );
   };
 
-  const dialogFooter = (
-    <div className="flex justify-content-center">
-      <Button
-        label="OK"
-        className="p-button-text"
-        autoFocus
-        onClick={() => setShowMessage(false)}
-      />
-    </div>
-  );
-
   return (
-    <div className="form-demo">
-      <div className="flex align-items-center justify-content-center">
+    <div className={css['form-demo']}>
+      <Toast ref={toast} />
+      <div className="flex align-items-center gap-3 justify-content-center">
         <div className="card">
           <h1 className="text-center">Login</h1>
           <form onSubmit={handleSubmit(onSubmit)} className="p-fluid">
@@ -160,17 +151,6 @@ export default function Login() {
           </form>
           <Link to="/signup">Dont have account? Signup</Link>
         </div>
-
-        <Dialog
-          visible={showMessage}
-          onHide={() => setShowMessage(false)}
-          position="top"
-          footer={dialogFooter}
-        >
-          <div className="p-col-12 p-md-6">
-            <InputText value={submitMessage} readOnly />
-          </div>
-        </Dialog>
       </div>
     </div>
   );

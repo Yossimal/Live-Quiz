@@ -1,23 +1,19 @@
-import { useEffect } from "react";
+import { useEffect, FC } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCredentials } from "../hooks/authHooks";
 
-type PrivateRouteProps = {
-  children: React.ReactNode;
-};
+export default function makePrivate(Component: FC) {
+  //return private component
+  return function (props: any) {
+    const user = useCredentials();
+    const navigate = useNavigate();
 
-function PrivateRoute({ children }: PrivateRouteProps) {
-  const navigate = useNavigate();
-  const user = useCredentials();
-  useEffect(() => {
-    if (!user) {
-      navigate("/", { replace: true });
-    }
-  }, [user]);
+    useEffect(() => {
+      if (!user) {
+        navigate("/", { replace: true });
+      }
+    }, [user]);
 
-  return children;
-}
-
-export default function makePrivate(node: React.ReactNode) {
-  return <PrivateRoute>{node}</PrivateRoute>;
+    return user ? <Component {...props} /> : <></>;
+  };
 }
