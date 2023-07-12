@@ -11,7 +11,8 @@ import {
     addQuestionValidation,
     updateQuestionValidation
 } from "./validation";
-import { addOptions, updatedOptions } from "./optionalOptions";
+import { addOptions, updatedOptions, setOptions } from "./optionalOptions";
+import { PrismaClientValidationError } from "@prisma/client/runtime/library";
 
 
 const prisma = new PrismaClient();
@@ -33,6 +34,34 @@ router.get("/", skipTakeValidation, async (req, res) => {
     res.send(games);
 });
 
+router.get("/:id", async (req, res) => {
+    const user = res.locals.user;
+    const id = Number(req.params.id);
+
+    if (!user) return res.sendStatus(401);
+    if (!id) return res.sendStatus(400);
+
+    const quiz = await prisma.quiz.findUnique({
+        where: {
+            id
+        }
+    });
+    if (!quiz) return res.sendStatus(404);
+
+    const questions = await prisma.question.findMany({
+        where: {
+            quizId: id
+        }
+    });
+
+    const questionsWithOptions = setOptions(questions);
+
+
+    res.send({ ...quiz, questions: questionsWithOptions });
+});
+
+
+
 router.post("/", postValidation, async (req, res) => {
     const user = res.locals.user;
     if (!user) return res.sendStatus(401);
@@ -46,7 +75,7 @@ router.post("/", postValidation, async (req, res) => {
             }
         });
         res.status(201).send(newQuiz);
-    } catch (err) {
+    } catch (err: PrismaClientValidationError | unknown) {
         res.sendStatus(500);
     }
 });

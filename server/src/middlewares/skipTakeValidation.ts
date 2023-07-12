@@ -2,7 +2,7 @@ import z, { ZodError } from 'zod';
 import { Request, Response, NextFunction } from "express";
 
 const skipTakeSchema = z.object({
-    skip: z.number().int().positive().default(0),
+    skip: z.number().int().default(0),
     take: z.number().int().positive().default(10)
 });
 

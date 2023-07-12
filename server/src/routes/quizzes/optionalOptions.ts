@@ -1,4 +1,5 @@
-import { PrismaClient, QuestionOption } from "@prisma/client";
+import { PrismaClient, QuestionOption, Question } from "@prisma/client";
+import { type } from "os";
 
 const prisma = new PrismaClient();
 
@@ -43,4 +44,19 @@ export function updatedOptions(options: QuestionOptionOnPutDto[]) {
         reslut.push(optionalOption);
     });
     return reslut;
+}
+
+type QuestionWithOption = Question & {
+    options: QuestionOption[];
+}
+
+export function setOptions(questions: Question[]) {
+    return questions.map(async (question) => {
+        const options = await prisma.questionOption.findMany({
+            where: {
+                questionId: question.id
+            }
+        });
+        return { ...question, options } as QuestionWithOption;
+    });
 }

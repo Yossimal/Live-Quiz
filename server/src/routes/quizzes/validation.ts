@@ -6,7 +6,6 @@ import { Request, Response, NextFunction } from "express";
 
 const quizPostSchema = z.object({
     name: z.string().min(2).max(100),
-    title: z.string().min(3).max(100),
     description: z.string().min(3).max(1000),
     image: z.string().url().optional()
 });
@@ -26,7 +25,6 @@ export function postValidation(req: Request, res: Response, next: NextFunction) 
 const quizPutSchema = z.object({
     id: z.number().int().positive(),
     name: z.string().min(2).max(100).optional(),
-    title: z.string().min(3).max(100).optional(),
     description: z.string().min(3).max(1000).optional(),
     image: z.string().url().optional()
 });
