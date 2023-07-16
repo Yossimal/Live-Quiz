@@ -46,15 +46,6 @@ async function sendVarificationEmail(user: User): Promise<void> {
   sendEmail(user.email, emailData);
 }
 
-// function generateAccessToken<T extends UserTokenData>(user: T) {
-//   const accessToken = jwt.sign(
-//     getTokenData(user),
-//     process.env.ACCESS_TOKEN_SECRET!,
-//     { expiresIn: "10s" }
-//   );
-//   return accessToken;
-// }
-
 router.post("/login", v.loginValidation, async (req, res) => {
   const { email, password } = res.locals.loginValues as v.LoginData;
   const user = await prisma.user.findFirst({
@@ -62,46 +53,41 @@ router.post("/login", v.loginValidation, async (req, res) => {
       email,
     },
   });
-  // We dont want to give clues to the end user about the existance of the email
-  // if (!user) {
-  //   return res.status(404).send({ error: "User not found" });
-  // }
+
   if (!user || !verifyPassword(password, user.password)) {
     return res.status(403).send({ error: "Invalid email or password" });
   }
+
   if (!user.varified) {
     await sendVarificationEmail(user);
     return res.status(403).send({ error: "Email not varified" });
   }
 
-  // const accessToken = generateAccessToken(user);
-  // const refreshToken = jwt.sign(
-  //   getTokenData(user),
-  //   process.env.REFRESH_TOKEN_SECRET!
-  // );
-
   const accessToken = await generateAccessToken(user);
   const refreshToken = await generateRefreshToken(user);
-  //addToken(email, refreshToken);
 
   res.send({ user, accessToken, refreshToken });
 });
+
 
 router.post("/token", v.tokenValidation, async (req, res) => {
   const auth = res.locals.auth as v.RefreshTokenData;
   const refreshToken = auth.token;
   const accessToken = await refreshAccessToken(refreshToken);
+
   if (!accessToken) return res.status(403).send({ error: "Invalid token" });
+
   res.send({ accessToken });
 });
 
-//WE DONT WANT TO SEND THE EMAIL IN THE REQUEST BECAUSE WE HAVE JWT!!!!
+
 router.post("/logout", v.logoutValidation, (req, res) => {
   const tokens = res.locals.tokens as v.LogoutData;
   deleteAcessToken(tokens.accessToken);
   deleteRefreshToken(tokens.refreshToken);
   res.sendStatus(204);
 });
+
 
 router.post("/signup", v.singupValidation, async (req, res) => {
   const { firstName, lastName, email, password, birthday } = res.locals
@@ -129,6 +115,7 @@ router.post("/signup", v.singupValidation, async (req, res) => {
     }
   }
 });
+
 
 router.post("/varifyEmail", v.emailVarificationValidation, async (req, res) => {
   const token: string = res.locals.token;

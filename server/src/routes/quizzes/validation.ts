@@ -1,4 +1,3 @@
-import { type } from 'os';
 import z, { ZodError } from 'zod';
 import { MediaType } from "@prisma/client";
 import { Request, Response, NextFunction } from "express";
@@ -48,7 +47,7 @@ const questionPostSchema = z.object({
     media: z.string().url().optional(),
     mediaType: z.nativeEnum(MediaType).optional(),
     options: z.array(z.object({
-        data: z.string().min(2).max(100),
+        data: z.string().min(1).max(100),
         isCorrect: z.boolean()
     }))
 });
@@ -65,16 +64,17 @@ export function addQuestionValidation(req: Request, res: Response, next: NextFun
     }
 }
 
+
 const questionPutSchema = z.object({
     id: z.number().int().positive(),
     question: z.string().min(2).max(100).optional(),
     media: z.string().url().optional(),
     mediaType: z.nativeEnum(MediaType).optional(),
     options: z.array(z.object({
-        id: z.number().int().positive(),
+        id: z.number().int().positive().optional(),
         data: z.string().min(2).max(100).optional(),
         isCorrect: z.boolean().optional()
-    }))
+    })).optional()
 });
 export type QuestionPutType = z.infer<typeof questionPutSchema>;
 
