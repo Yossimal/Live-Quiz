@@ -10,9 +10,11 @@ import { Checkbox, CheckboxChangeEvent } from "primereact/checkbox";
 import { Dialog } from "primereact/dialog";
 import { Divider } from "primereact/divider";
 import { classNames } from "primereact/utils";
-import "../../css/Form.module.css";
 import { useNavigate, Link } from "react-router-dom";
 import { SingupData } from "../../types/auth";
+import logo from "../../imags/apple-touch-icon.png";
+import { ProgressSpinner } from 'primereact/progressspinner';
+
 
 type FormData = SingupData & { confirmPassword: string; accept: boolean };
 
@@ -28,6 +30,7 @@ export default function Singup() {
   const navigate = useNavigate();
   const [showMessage, setShowMessage] = useState(false);
   const [showErorrMessage, setShowErorrMessage] = useState(false);
+  const [loading, setLoading] = useState(false);
   const defaultValues: FormData = {
     firstName: "",
     lastName: "",
@@ -50,7 +53,9 @@ export default function Singup() {
 
   const onSubmit = async (data: FormData) => {
     setFormData(data);
+    setLoading(true);
     const err = await signup(data);
+    setLoading(false);
     if (err) {
       setShowErorrMessage(true);
     } else {
@@ -94,7 +99,7 @@ export default function Singup() {
   );
 
   return (
-    <div className="form-demo">
+    <div>
       <Dialog
         visible={showMessage}
         onHide={() => setShowMessage(false)}
@@ -107,9 +112,9 @@ export default function Singup() {
         <div className="flex justify-content-center flex-column pt-6 px-3">
           <i
             className="pi pi-check-circle"
-            style={{ fontSize: "5rem", color: "var(--green-500)" }}
+            style={{ fontSize: "3rem", color: "var(--green-500)" }}
           ></i>
-          <h5>Registration Successful!</h5>
+          <h2>Registration Successful!</h2>
           <p style={{ lineHeight: 1.5, textIndent: "1rem" }}>
             Your account is registered under name{" "}
             <b>{`${formData.firstName} ${formData.lastName}`}</b> ; it'll be
@@ -130,20 +135,25 @@ export default function Singup() {
       >
         <div className="flex justify-content-center flex-column pt-6 px-3">
           <i
-            className="pi pi-check-circle"
-            style={{ fontSize: "5rem", color: "var(--green-500)" }}
+            className="pi pi-times"
+            style={{ fontSize: "3rem", color: "var(--red-500)" }}
           ></i>
-          <h5>Registration Faild 😰</h5>
+          <h2>Registration Faild 😰</h2>
           <p style={{ lineHeight: 1.5, textIndent: "1rem" }}>
             please try agein later
           </p>
         </div>
       </Dialog>
 
-      <div className="flex align-items-center justify-content-center">
-        <div className="card">
-          <h1 className="text-center">Register</h1>
-          <form onSubmit={handleSubmit(onSubmit)} className="p-fluid">
+      <div className={` flex align-items-center justify-content-center`}>
+        <div className="surface-card p-5 mt-3 shadow-2 border-round w-full lg:w-6">
+
+          <div className="text-center mb-5">
+            <img src={logo} alt="logo" height={50} className="mb-2" />
+            <h1 className="text-900 text-3xl font-medium mb-3">Get Start!</h1>
+          </div>
+
+          <form onSubmit={handleSubmit(onSubmit)} className="p-fluid flex flex-column gap-2">
             <div className="field">
               <span className="p-float-label">
                 <Controller
@@ -244,6 +254,7 @@ export default function Singup() {
                       })}
                       header={passwordHeader}
                       footer={passwordFooter}
+
                     />
                   )}
                 />
@@ -332,9 +343,10 @@ export default function Singup() {
               </label>
             </div>
 
-            <Button type="submit" label="Singup" className="mt-2" />
+            <Button type="submit" label="Singup" className={`${!loading ? 'block' : 'hidden'} p-mt-2`} />
+            <ProgressSpinner className={loading ? 'block' : 'hidden'} />
           </form>
-          <Link to="/" className="p-d-block p-text-center mt-2">
+          <Link to="/" className="font-medium no-underline text-blue-500 text-right cursor-pointerp-d-block p-text-center mt-2">
             Already have an account?
           </Link>
         </div>

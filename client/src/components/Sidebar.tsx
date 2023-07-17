@@ -1,10 +1,34 @@
-import { PanelMenu } from 'primereact/panelmenu'
+import { Menu } from 'primereact/menu'
 import { MenuItem } from 'primereact/menuitem'
 import { useAuthenticate } from '../hooks/authHooks'
-// import { useAuth } from '../hooks/useAuth'
+import { useRef } from 'react'
+import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
+import { Toast } from 'primereact/toast';
 
-export default function Sidebar() {
+export default function SidebarMenu() {
     const { logout } = useAuthenticate()
+
+    const toast = useRef<Toast>(null);
+
+    const accept = async () => {
+        toast.current?.show({ severity: 'info', summary: 'Confirmed', detail: 'You have logout', life: 3000 });
+        await logout()
+    }
+
+    const reject = () => {
+        toast.current?.show({ severity: 'success', summary: 'Good', detail: 'You sty in!', life: 3000 });
+    }
+
+    const confirm = () => {
+        confirmDialog({
+            message: 'Are you sure you want to logout?',
+            header: 'Confirmation',
+            icon: 'pi pi-exclamation-triangle',
+            accept,
+            reject
+        });
+    };
+
     const items: MenuItem[] = [
         {
             label: 'Quizzes',
@@ -12,21 +36,18 @@ export default function Sidebar() {
             items: [
                 {
                     label: 'New',
-                    url: '/quiz/new',
+                    url: '/home/quiz/new',
                     icon: 'pi pi-fw pi-plus',
-                },
-                {
-                    separator: true
                 },
                 {
                     label: 'My Quizzes',
                     icon: 'pi pi-fw pi-list',
-                    url: '/quiz/my'
+                    url: '/home/quiz/my'
                 },
                 {
                     label: 'Shaerd With Me',
                     icon: 'pi pi-fw pi-share-alt',
-                    url: '/quiz/shared'
+                    url: '/home/quiz/shared'
                 }
             ]
         },
@@ -37,12 +58,12 @@ export default function Sidebar() {
                 {
                     label: 'Profile',
                     icon: 'pi pi-fw pi-user-edit',
-                    url: '/profile'
+                    url: '/home/profile'
                 },
                 {
                     label: 'Settings',
                     icon: 'pi pi-fw pi-cog',
-                    url: '/settings'
+                    url: '/home/settings'
                 }
             ]
         },
@@ -52,17 +73,17 @@ export default function Sidebar() {
         {
             label: 'Logout',
             icon: 'pi pi-fw pi-sign-out',
-            command: async () => {
-                console.log('logout')
-                await logout()
+            command: () => {
+                confirm()
             }
         }
     ]
 
     return (
-        <div className='h-screen left-0 min-w-max fixed top-0 m-1'>
-            <PanelMenu model={items} />
+        <div>
+            <Toast ref={toast} />
+            <ConfirmDialog />
+            <Menu model={items} className='overflow-auto h-screen left-0 w-12rem fixed top-0 m-1' />
         </div>
     )
-
 }

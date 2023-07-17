@@ -25,34 +25,39 @@ export type QuestionOptionType = {
   data: string;
   questionId: number;
   isCorrect: boolean;
-  question?: QuestionType;
+  createdAt: Date;
+  updatedAt: Date;
 };
 
 export type QuestionType = {
   id: number;
-  data: string;
-  gameId: number;
+  question: string;
+  quizId: number;
   options?: QuestionOptionType[];
-  game?: GameType;
+  quiz?: QuizType;
   mediaType: MediaType;
-  mediaUrl: string;
+  media: string;
+  createdAt: Date;
+  updatedAt: Date;
 };
 
-export type GameType = {
+export type QuizType = {
   id: number;
   name: string;
   description: string;
   image: string;
   questions?: QuestionType[];
   creatorId: number;
-  creator?: UserType;
+  //creator?: UserType;
   onlineGames?: OnlineGameType[];
+  createdAt: Date;
+  updatedAt: Date;
 };
 
 export type OnlineGameType = {
   id: number;
   gameId: number;
-  game?: GameType;
+  game?: QuizType;
   players?: PlayerType[];
 };
 
@@ -60,7 +65,7 @@ export type PlayerType = {
   id: number;
   score: number;
   gameId: number;
-  game?: GameType;
+  game?: QuizType;
 };
 
 export type TimeStampType = {

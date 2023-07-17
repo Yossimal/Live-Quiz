@@ -1,11 +1,17 @@
 import makePrivate from "../../router/makePrivate";
-import Sidebar from "../../components/Sidebar"
+import SidebarMenu from "../../components/Sidebar"
+// import { Outlet } from "react-router-dom";
+import Main from "../../components/Main";
 
 
 function Home() {
     return (
-        <div>
-            <Sidebar />
+        <div className="flex flex-column">
+            <SidebarMenu />
+
+            <Main />
+
+            {/* <Outlet /> */}
         </div>
     )
 }
