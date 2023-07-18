@@ -1,9 +1,14 @@
 import { useParams } from "react-router-dom"
 import { useQuery } from "react-query";
 import { useAxios } from "../../hooks/useAxios";
-import { QuizType } from "../../types/dataObjects";
+import { QuizType, QuestionType } from "../../types/dataObjects";
 import { ProgressBar } from 'primereact/progressbar';
 import Error from "../../components/Error";
+
+
+// function Question({ question }: { question: QuestionType }) {
+//     return (
+
 
 
 export default function Quiz() {

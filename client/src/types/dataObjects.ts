@@ -52,6 +52,10 @@ export type QuizType = {
   onlineGames?: OnlineGameType[];
   createdAt: Date;
   updatedAt: Date;
+  _count?: {
+    questions: number;
+    onlineGames: number;
+  }
 };
 
 export type OnlineGameType = {

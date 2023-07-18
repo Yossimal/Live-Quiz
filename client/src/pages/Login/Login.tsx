@@ -9,7 +9,7 @@ import { Toast } from "primereact/toast";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuthenticate, useCredentials } from "../../hooks/authHooks";
 import { LoginMutation } from "../../types/auth";
-import logo from "../../imags/apple-touch-icon.png";
+import logo from "../../assets/apple-touch-icon.png";
 import { ProgressSpinner } from 'primereact/progressspinner';
 
 

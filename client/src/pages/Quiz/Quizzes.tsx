@@ -6,7 +6,7 @@ import { DataView } from 'primereact/dataview';
 import { useEffect } from "react";
 import { ProgressBar } from 'primereact/progressbar';
 import Error from "../../components/Error";
-
+import QuizItem from "./QuizItem";
 
 
 
@@ -22,6 +22,7 @@ export default function Quizzes() {
         console.log("fetching quizzes")
         console.log(instance)
         const { data } = await instance!.get<QuizType[]>("/quiz");
+        console.log(data)
         return data;
     })
 
@@ -36,18 +37,11 @@ export default function Quizzes() {
     if (!data) return <h1>no data</h1>
 
     return (
-        <div className="ml-30">
+        <div className="card">
             <h1>Quizzes</h1>
             <DataView value={data} itemTemplate={(quiz: QuizType) => {
-                return (
-                    <div>
-                        <h1>{quiz.name}</h1>
-                        <p>{quiz.description}</p>
-                        <button onClick={() => navigate(`/home/quiz/${quiz.id}`)}>Show</button>
-                    </div>
-                )
-            }}>
-            </DataView>
+                return <QuizItem quiz={quiz} />
+            }} />
         </div>
     )
 }

@@ -1,12 +1,15 @@
 import { Menu } from 'primereact/menu'
 import { MenuItem } from 'primereact/menuitem'
 import { useAuthenticate } from '../hooks/authHooks'
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import { Toast } from 'primereact/toast';
+import { Sidebar } from 'primereact/sidebar';
+import { Button } from 'primereact/button';
 
 export default function SidebarMenu() {
-    const { logout } = useAuthenticate()
+    const { logout } = useAuthenticate();
+    const [showSidebar, setShowSidebar] = useState(false);
 
     const toast = useRef<Toast>(null);
 
@@ -71,11 +74,12 @@ export default function SidebarMenu() {
             separator: true
         },
         {
-            label: 'Logout',
-            icon: 'pi pi-fw pi-sign-out',
             command: () => {
                 confirm()
-            }
+            },
+            label: 'Logout',
+            icon: 'pi pi-fw pi-sign-out',
+            className: 'absolute bottom-0 mb-2 w-full'
         }
     ]
 
@@ -83,7 +87,25 @@ export default function SidebarMenu() {
         <div>
             <Toast ref={toast} />
             <ConfirmDialog />
-            <Menu model={items} className='overflow-auto h-screen left-0 w-12rem fixed top-0 m-1' />
+            <Button
+                icon="pi pi-bars"
+                className="mr-2 mb-2 block md:hidden"
+                onClick={() => setShowSidebar(true)}
+            />
+            <Sidebar
+                visible={showSidebar}
+                onHide={() => setShowSidebar(false)}
+                dismissable
+                showCloseIcon={false}
+                position="left"
+                className='w-auto'
+
+            >
+                <Menu model={items} className="h-screen fixed top-0 left-0" />
+            </Sidebar>
+            <div className="hidden md:block">
+                <Menu model={items} className="overflow-auto h-screen left-0 w-12rem fixed top-0 m-1" />
+            </div>
         </div>
-    )
+    );
 }

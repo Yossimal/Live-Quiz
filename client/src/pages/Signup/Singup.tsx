@@ -12,7 +12,7 @@ import { Divider } from "primereact/divider";
 import { classNames } from "primereact/utils";
 import { useNavigate, Link } from "react-router-dom";
 import { SingupData } from "../../types/auth";
-import logo from "../../imags/apple-touch-icon.png";
+import logo from "../../assets/apple-touch-icon.png";
 import { ProgressSpinner } from 'primereact/progressspinner';
 
 

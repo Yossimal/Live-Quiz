@@ -29,7 +29,15 @@ router.get("/", skipTakeValidation, async (req, res) => {
             isDeleted: false
         },
         skip,
-        take
+        take,
+        include: {
+            _count: {
+                select: {
+                    questions: true,
+                    onlineQuizzes: true
+                }
+            }
+        }
     });
     res.send(games);
 });
