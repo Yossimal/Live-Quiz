@@ -100,6 +100,9 @@ router.post("/", postValidation, async (req, res) => {
         creatorId: user.id,
         imageId: quiz.image,
       },
+      select: {
+        id: true,
+      },
     });
     res.status(201).send(newQuiz);
   } catch (err: PrismaClientValidationError | unknown) {
@@ -245,11 +248,19 @@ router.put("/updateQuestion", updateQuestionValidation, async (req, res) => {
 
 function splitQuestionsToUpdatAddAndDelete(
   questions: UpdateQuizQuestionType[]
-): [UpdateQuizQuestionOptionType[],UpdateQuizQuestionOptionType[], UpdateQuizQuestionOptionType[]] {
-  const questionsToUpdate = questions.filter((q) => q.id !== undefined && !q.isDeleted);
+): [
+  UpdateQuizQuestionOptionType[],
+  UpdateQuizQuestionOptionType[],
+  UpdateQuizQuestionOptionType[]
+] {
+  const questionsToUpdate = questions.filter(
+    (q) => q.id !== undefined && !q.isDeleted
+  );
   const questionsToAdd = questions.filter((q) => q.id === undefined);
-  const questionsToDelete = questions.filter((q) => q.id !== undefined && q.isDeleted);
-  return [questionsToUpdate,questionsToDelete, questionsToAdd];
+  const questionsToDelete = questions.filter(
+    (q) => q.id !== undefined && q.isDeleted
+  );
+  return [questionsToUpdate, questionsToDelete, questionsToAdd];
 }
 
 type OptionToAdd = UpdateQuizQuestionOptionType & { quesitionId: number };
@@ -427,7 +438,6 @@ async function deleteQuestions(
   });
   await Promise.all([deleteQuestionsPromise, deleteOptionsPromise]);
 }
-
 
 router.post("/update", updateQuizValidation, async (req, res) => {
   const quiz = res.locals.updatedQuiz as UpdateQuizType;

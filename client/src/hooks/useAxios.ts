@@ -23,6 +23,9 @@ export function useAxios(): { instance: AxiosInstance | null } {
       if (error.response.status === 403) {
         await refresh();
       }
+      else{
+        throw error;
+      }
     }
   );
   //setInstance(_instance);

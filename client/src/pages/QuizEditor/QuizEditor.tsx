@@ -3,7 +3,7 @@ import QuestionPanel from "./QuestionPanel";
 import { Button } from "primereact/button";
 import { addButton } from "../../common/styles";
 
-export default function NewQuiz() {
+export default function QuizEditor() {
   const [questions, setQuestions] = useState<EdibleQuestionType[]>([]);
   const [description, setDescription] = useState<string>("");
   const [name, setName] = useState<string>("");

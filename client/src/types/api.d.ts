@@ -31,3 +31,13 @@ export type SaveQuizRequest = {
   image?: string;
   questions?: SaveQuestionRequest[];
 };
+
+export type CreateQuizRequest = {
+  name: string;
+  description: string;
+  image?: string;
+}
+
+export type CreateQuizResponse = {
+  id: number;
+}

@@ -6,7 +6,6 @@ const quizPostSchema = z.object({
   name: z.string().min(2).max(100),
   description: z.string().min(3).max(1000),
   image: z.number().optional(),
-
 });
 export type QuizType = z.infer<typeof quizPostSchema>;
 
@@ -21,7 +20,13 @@ export function postValidation(
     next();
   } catch (error: ZodError | unknown) {
     //TODO :: send clear string to the end user with the error!!!!!!!!!!
-    res.status(400).send({ error: (error as ZodError).errors });
+    // res.status(400).send({ error: (error as ZodError).errors });
+    res
+      .status(400)
+      .send({
+        message:
+          "There is an error in the description or the name.\nmake sure you have between 2 to 100 characters in the name and between 3 to 1000 characters in the description.",
+      });
   }
 }
 
@@ -112,9 +117,13 @@ const updateQuizQuestionOptionSchema = z
     isCorrect: z.boolean().optional(),
     isDeleted: z.boolean().optional(),
   })
-  .refine((schema) => !(!schema.id && (!schema.data || schema.isCorrect===undefined)), {
-    message: "data and is correct are required for new options",
-  });
+  .refine(
+    (schema) =>
+      !(!schema.id && (!schema.data || schema.isCorrect === undefined)),
+    {
+      message: "data and is correct are required for new options",
+    }
+  );
 
 const updateQuizQuestionSchema = z
   .object({
@@ -128,7 +137,13 @@ const updateQuizQuestionSchema = z
     isDeleted: z.boolean().optional(),
   })
   .refine(
-    (schema) => !(!schema.id && (!schema.question || schema.index == undefined || schema.time == undefined)),
+    (schema) =>
+      !(
+        !schema.id &&
+        (!schema.question ||
+          schema.index == undefined ||
+          schema.time == undefined)
+      ),
     {
       message: "question index and time are required for new questions",
     }
