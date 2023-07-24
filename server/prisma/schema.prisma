@@ -33,6 +33,7 @@ model User {
   updatedAt DateTime  @updatedAt
   role      Role      @default(USER)
   games     Quiz[]
+  medias    Media[]
   isDeleted Boolean   @default(false)
 
   @@index([email])
@@ -43,6 +44,7 @@ model QuestionOption {
   data       String
   questionId Int
   question   Question @relation(fields: [questionId], references: [id])
+  isDeleted  Boolean  @default(false)
   isCorrect  Boolean
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
@@ -54,7 +56,10 @@ model Question {
   options   QuestionOption[]
   quiz      Quiz             @relation(fields: [quizId], references: [id])
   quizId    Int
-  media     String?
+  time      Int              @default(10)
+  mediaId   Int?
+  index     Int              @default(0)
+  media     Media?           @relation(fields: [mediaId], references: [id])
   mediaType MediaType        @default(NONE)
   createdAt DateTime         @default(now())
   updatedAt DateTime         @updatedAt
@@ -65,7 +70,8 @@ model Quiz {
   id            Int          @id @default(autoincrement())
   name          String
   description   String
-  image         String?
+  imageId       Int?
+  image         Media?       @relation(fields: [imageId], references: [id])
   questions     Question[]
   creatorId     Int
   creator       User         @relation(fields: [creatorId], references: [id])
@@ -98,6 +104,19 @@ model EmailValidationTokens {
   expiresAt DateTime @default(dbgenerated("(CURRENT_TIMESTAMP + INTERVAL 1 DAY)"))
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Media {
+  id        Int        @id @default(autoincrement())
+  path      String     @unique
+  type      MediaType
+  ownerId   Int
+  question  Question[]
+  quiz      Quiz[]
+  owner     User       @relation(fields: [ownerId], references: [id])
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  quizId    Int?
 }
 
 model PasswordResetTokens {

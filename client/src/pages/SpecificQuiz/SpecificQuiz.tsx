@@ -11,7 +11,7 @@ import Error from "../../components/Error";
 
 
 
-export default function Quiz() {
+export default function SpecificQuiz() {
     const { id } = useParams<{ id: string }>();
 
     const { instance } = useAxios();
