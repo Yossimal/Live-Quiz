@@ -39,9 +39,8 @@ export default function Quizzes() {
     return (
         <div className="card">
             <h1>Quizzes</h1>
-            <DataView value={data} itemTemplate={(quiz: QuizType) => {
-                return <QuizItem quiz={quiz} />
-            }} />
+            <DataView value={data} itemTemplate={(quiz: QuizType) =>
+                <QuizItem quiz={quiz} />} />
         </div>
     )
 }
