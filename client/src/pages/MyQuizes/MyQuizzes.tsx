@@ -19,8 +19,6 @@ export default function MyQuizzes() {
   const { data, isLoading, isError, error } = useQuery<QuizType[]>(
     ["my-quizzes"],
     async () => {
-      console.log("fetching quizzes");
-      console.log(instance);
       const { data } = await instance!.get<QuizType[]>("/quiz");
       console.log(data);
       return data;
@@ -52,7 +50,7 @@ export default function MyQuizzes() {
           }}
         />
       </div>
-      
+
     </>
   );
 }

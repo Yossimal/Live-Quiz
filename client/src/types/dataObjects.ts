@@ -70,7 +70,9 @@ export type PlayerType = {
   score: number;
   gameId: number;
   game?: QuizType;
+  name: string;
 };
+
 
 export type TimeStampType = {
   createdAt: Date;
