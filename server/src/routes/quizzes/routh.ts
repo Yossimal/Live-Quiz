@@ -168,10 +168,10 @@ router.delete("/:id", async (req, res) => {
 
 type OptionPut =
   | {
-      id?: number;
-      data?: string;
-      isCorrect?: boolean;
-    }
+    id?: number;
+    data?: string;
+    isCorrect?: boolean;
+  }
   | undefined;
 
 function getOptions(options: OptionPut[] | undefined) {
@@ -249,10 +249,10 @@ router.put("/updateQuestion", updateQuestionValidation, async (req, res) => {
 function splitQuestionsToUpdatAddAndDelete(
   questions: UpdateQuizQuestionType[]
 ): [
-  UpdateQuizQuestionOptionType[],
-  UpdateQuizQuestionOptionType[],
-  UpdateQuizQuestionOptionType[]
-] {
+    UpdateQuizQuestionOptionType[],
+    UpdateQuizQuestionOptionType[],
+    UpdateQuizQuestionOptionType[]
+  ] {
   const questionsToUpdate = questions.filter(
     (q) => q.id !== undefined && !q.isDeleted
   );
@@ -426,7 +426,7 @@ async function deleteQuestions(
       isDeleted: true,
     },
   });
-  const deleteOptionsPromise = prisma.questionOption.updateMany({
+  const deleteOptionsPromise = prisma.questionOption.deleteMany({
     where: {
       questionId: {
         in: questionsId,
