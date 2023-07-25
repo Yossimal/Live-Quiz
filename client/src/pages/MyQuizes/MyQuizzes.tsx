@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import Error from "../../components/Error";
 import Loader from "../../components/Loader"
 import QuizItem from "./QuizItem";
+import { ProgressBar } from "primereact/progressbar";
 
 export default function MyQuizzes() {
   const navigate = useNavigate();
