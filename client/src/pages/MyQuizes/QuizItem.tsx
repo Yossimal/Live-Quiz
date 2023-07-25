@@ -35,7 +35,7 @@ export default function QuizItem({ quiz }: { quiz: QuizType }) {
                     </div>
                     <div className="flex sm:flex-column align-items-center sm:align-items-end gap-3 sm:gap-2">
                         <Button tooltipOptions={{ position: 'top' }} tooltip='Play Quiz' icon="pi pi-play" className="p-button-rounded" onClick={() => navigate(`/home/quiz/play/${quiz.id}`)}></Button>
-                        <Button tooltipOptions={{ position: 'bottom' }} tooltip='Edit Quiz' icon="pi pi-pencil" className="p-button-rounded" onClick={() => navigate(`/home/quiz/${quiz.id}`)}></Button>
+                        <Button tooltipOptions={{ position: 'bottom' }} tooltip='Edit Quiz' icon="pi pi-pencil" className="p-button-rounded" onClick={() => navigate(`/home/quiz/edit/${quiz.id}`)}></Button>
                     </div>
                 </div>
             </div>

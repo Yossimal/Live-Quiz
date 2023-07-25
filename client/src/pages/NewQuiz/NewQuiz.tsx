@@ -7,7 +7,6 @@ import { useMutation } from "react-query";
 import { CreateQuizRequest, CreateQuizResponse } from "../../types/api";
 import { useAxios } from "../../hooks/useAxios";
 import { useNavigate } from "react-router-dom";
-import asPromise from "../../common/asPromise";
 import { AxiosError } from "axios";
 import { Toast } from "primereact/toast";
 import { ProgressSpinner } from "primereact/progressspinner";
@@ -24,7 +23,7 @@ export default function NewQuiz() {
   const toast = useRef<Toast>(null);
 
   const createQuizMutation = useMutation({
-    mutationKey: ["quiz"],
+    mutationKey: ["my-quizzes"],
     mutationFn: async (quiz: CreateQuizRequest) => {
       if (!axios.instance) {
         throw new Error("No axios instance");

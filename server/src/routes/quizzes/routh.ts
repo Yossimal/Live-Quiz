@@ -260,7 +260,12 @@ function splitQuestionsToUpdatAddAndDelete(
   const questionsToDelete = questions.filter(
     (q) => q.id !== undefined && q.isDeleted
   );
-  return [questionsToUpdate, questionsToDelete, questionsToAdd];
+  console.log("splitted", [
+    questionsToUpdate,
+    questionsToDelete,
+    questionsToAdd,
+  ]);
+  return [questionsToUpdate, questionsToAdd, questionsToDelete];
 }
 
 type OptionToAdd = UpdateQuizQuestionOptionType & { quesitionId: number };
@@ -316,6 +321,8 @@ async function updateQuestions(
         mediaId: q.media,
         idDeleted: q.isDeleted ?? false,
         index: q.index,
+        score: q.score,
+        time: q.time,
       });
       await prisma.question.update({
         where: {
@@ -369,7 +376,7 @@ function getAddQuestionPromise(
   questions: UpdateQuizQuestionType[],
   quizId: number
 ): Promise<void>[] {
-  console.log(questions);
+  console.log("craeting", questions);
   return questions.map((q) =>
     prisma.question
       .create({
@@ -377,6 +384,8 @@ function getAddQuestionPromise(
           question: q.question,
           mediaId: q.media,
           index: q.index,
+          time: q.time,
+          score: q.score,
           quizId,
         }),
         select: {
@@ -441,9 +450,8 @@ async function deleteQuestions(
 
 router.post("/update", updateQuizValidation, async (req, res) => {
   const quiz = res.locals.updatedQuiz as UpdateQuizType;
-  const [questionsToUpdate, questionsToAdd] = splitQuestionsToUpdatAddAndDelete(
-    quiz.questions ?? []
-  );
+  const [questionsToUpdate, questionsToAdd, questionsToDelete] =
+    splitQuestionsToUpdatAddAndDelete(quiz.questions ?? []);
   const optionsToAdd = getOptionsToAdd(questionsToAdd);
   try {
     await Promise.all([
@@ -452,6 +460,7 @@ router.post("/update", updateQuizValidation, async (req, res) => {
       updateOptions(questionsToUpdate),
       addOptions(optionsToAdd),
       addQuestions(questionsToAdd, quiz.id),
+      deleteQuestions(questionsToDelete),
     ]);
     const updatedQuiz = await prisma.quiz.findUnique({
       where: {
@@ -459,14 +468,22 @@ router.post("/update", updateQuizValidation, async (req, res) => {
       },
       include: {
         questions: {
+          where: {
+            isDeleted: false,
+          },
           include: {
-            options: true,
+            options: {
+              where: {
+                isDeleted: false,
+              },
+            },
           },
         },
       },
     });
     res.send(updatedQuiz);
   } catch (err) {
+    console.error(err);
     res.sendStatus(500);
   }
 });

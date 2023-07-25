@@ -8,23 +8,22 @@ export type LoginResponse = {
 };
 
 export type SaveQuestionOptionRequest = {
-  isNew: boolean;
   id?: number;
   data?: string;
   isCorrect?: boolean;  
 };
 
 export type SaveQuestionRequest = {
-  isNew: boolean;
   id?: number;
   index?: number;
   question?: string;
   media?: string;
+  time?: number;
+  scpre: number;
   options?: SaveQuestionOptionRequest[];
 }
 
 export type SaveQuizRequest = {
-  isNew: boolean;
   id?: number;
   name?: string;
   description?: string;

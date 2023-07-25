@@ -59,6 +59,7 @@ model Question {
   time      Int              @default(10)
   mediaId   Int?
   index     Int              @default(0)
+  score     Int              @default(100)
   media     Media?           @relation(fields: [mediaId], references: [id])
   mediaType MediaType        @default(NONE)
   createdAt DateTime         @default(now())

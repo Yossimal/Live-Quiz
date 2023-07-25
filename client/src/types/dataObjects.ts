@@ -39,6 +39,9 @@ export type QuestionType = {
   media: string;
   createdAt: Date;
   updatedAt: Date;
+  index: number;
+  time: number;
+  score: number;
 };
 
 export type QuizType = {
@@ -55,7 +58,7 @@ export type QuizType = {
   _count?: {
     questions: number;
     onlineGames: number;
-  }
+  };
 };
 
 export type OnlineGameType = {

@@ -5,7 +5,6 @@ import { QuizType } from "../../types/dataObjects";
 import { DataView } from "primereact/dataview";
 import { useEffect } from "react";
 import { ProgressBar } from "primereact/progressbar";
-import Error from "../../components/Error";
 import QuizItem from "./QuizItem";
 
 export default function MyQuizzes() {
@@ -16,15 +15,17 @@ export default function MyQuizzes() {
     if (!instance) navigate("/");
   }, [instance]);
 
-  const { data, isLoading, isError, error } = useQuery<QuizType[]>(
-    ["my-quizzes"],
-    async () => {
+  const { data, isLoading, isError } = useQuery<QuizType[]>({
+    queryKey:["my-quizzes"],
+    queryFn:async () => {
       console.log("fetching quizzes");
       console.log(instance);
       const { data } = await instance!.get<QuizType[]>("/quiz");
       console.log(data);
       return data;
-    }
+    },
+    staleTime: 1000 * 60 * 5,//set the query fresh for 5 minutes
+  }
   );
 
   if (isLoading)

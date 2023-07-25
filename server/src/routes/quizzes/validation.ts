@@ -21,12 +21,10 @@ export function postValidation(
   } catch (error: ZodError | unknown) {
     //TODO :: send clear string to the end user with the error!!!!!!!!!!
     // res.status(400).send({ error: (error as ZodError).errors });
-    res
-      .status(400)
-      .send({
-        message:
-          "There is an error in the description or the name.\nmake sure you have between 2 to 100 characters in the name and between 3 to 1000 characters in the description.",
-      });
+    res.status(400).send({
+      message:
+        "There is an error in the description or the name.\nmake sure you have between 2 to 100 characters in the name and between 3 to 1000 characters in the description.",
+    });
   }
 }
 
@@ -134,6 +132,7 @@ const updateQuizQuestionSchema = z
     optionsToDelete: z.array(z.number().int().positive()).optional(),
     index: z.number().int().optional(),
     time: z.number().int().positive().optional(),
+    score: z.number().int().positive().optional(),
     isDeleted: z.boolean().optional(),
   })
   .refine(
@@ -141,11 +140,12 @@ const updateQuizQuestionSchema = z
       !(
         !schema.id &&
         (!schema.question ||
-          schema.index == undefined ||
-          schema.time == undefined)
+          schema.index === undefined ||
+          schema.time === undefined ||
+          schema.score === undefined)
       ),
     {
-      message: "question index and time are required for new questions",
+      message: "question index, score, and time are required for new questions",
     }
   );
 

@@ -2,10 +2,11 @@ import { Panel, PanelHeaderTemplateOptions } from "primereact/panel";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { Toolbar } from "primereact/toolbar";
-import { useState } from "react";
+import { InputNumber } from "primereact/inputnumber";
+import NumberInput from "./NumberInput";
 
 type QuestionPanelProps = {
-  questionState: ArrayState<EdibleQuestionType>;
+  questionState: PartialState<EdibleQuestionType>;
   onDelete: FullFunciton<void, [number]>;
 };
 
@@ -97,7 +98,27 @@ export default function QuestionPanel({
             id="question"
             value={question.question}
             onChange={(e) =>
-              setQuestion({ ...question, question: e.currentTarget.value })
+              setQuestion({
+                ...question,
+                question: e.currentTarget.value,
+                isChanged: true,
+              })
+            }
+          />
+          <NumberInput
+            id="score"
+            labelText="Score:"
+            value={question.time ?? 10}
+            onChange={(time) =>
+              setQuestion({ ...question, time, isChanged: true })
+            }
+          />
+          <NumberInput
+            id="time"
+            labelText="Time:"
+            value={question.score ?? 100}
+            onChange={(score) =>
+              setQuestion({ ...question, score, isChanged: true })
             }
           />
         </div>
