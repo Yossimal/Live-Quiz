@@ -168,10 +168,10 @@ router.delete("/:id", async (req, res) => {
 
 type OptionPut =
   | {
-    id?: number;
-    data?: string;
-    isCorrect?: boolean;
-  }
+      id?: number;
+      data?: string;
+      isCorrect?: boolean;
+    }
   | undefined;
 
 function getOptions(options: OptionPut[] | undefined) {
@@ -249,10 +249,10 @@ router.put("/updateQuestion", updateQuestionValidation, async (req, res) => {
 function splitQuestionsToUpdatAddAndDelete(
   questions: UpdateQuizQuestionType[]
 ): [
-    UpdateQuizQuestionOptionType[],
-    UpdateQuizQuestionOptionType[],
-    UpdateQuizQuestionOptionType[]
-  ] {
+  UpdateQuizQuestionOptionType[],
+  UpdateQuizQuestionOptionType[],
+  UpdateQuizQuestionOptionType[]
+] {
   const questionsToUpdate = questions.filter(
     (q) => q.id !== undefined && !q.isDeleted
   );
@@ -260,20 +260,33 @@ function splitQuestionsToUpdatAddAndDelete(
   const questionsToDelete = questions.filter(
     (q) => q.id !== undefined && q.isDeleted
   );
-  return [questionsToUpdate, questionsToDelete, questionsToAdd];
+  console.log("splitted", [
+    questionsToUpdate,
+    questionsToDelete,
+    questionsToAdd,
+  ]);
+  return [questionsToUpdate, questionsToAdd, questionsToDelete];
 }
 
 type OptionToAdd = UpdateQuizQuestionOptionType & { quesitionId: number };
 
 function getOptionsToAdd(questions: UpdateQuizQuestionType[]): OptionToAdd[] {
+  console.log("getOptionsToAdd", questions);
   return (
     questions
       .map((q) => q.options?.map((o) => ({ ...o, quesitionId: q.id })))
       .flat()
-      .filter(
-        (o): o is OptionToAdd =>
+      .filter((o): o is OptionToAdd => {
+        console.log(
+          o,
+          o?.quesitionId !== undefined && o?.id === undefined,
+          o?.quesitionId,
+          o?.id
+        );
+        return (
           o != undefined && o.quesitionId !== undefined && o.id === undefined
-      ) ?? []
+        );
+      }) ?? []
   );
 }
 
@@ -314,8 +327,10 @@ async function updateQuestions(
       const updateQuestionQuery = removeUndefined({
         question: q.question,
         mediaId: q.media,
-        idDeleted: q.isDeleted ?? false,
+        isDeleted: q.isDeleted ?? false,
         index: q.index,
+        score: q.score,
+        time: q.time,
       });
       await prisma.question.update({
         where: {
@@ -354,14 +369,16 @@ async function updateOptions(
 }
 
 async function addOptions(options: OptionToAdd[]): Promise<void> {
+  console.log("adding", options);
   await prisma.questionOption.createMany({
-    data: options.map((o) =>
-      removeUndefined({
+    data: options.map((o) => {
+      console.log("creating", o);
+      return removeUndefined({
         data: o.data,
         isCorrect: o.isCorrect,
         questionId: o.quesitionId,
-      })
-    ),
+      });
+    }),
   });
 }
 
@@ -369,7 +386,7 @@ function getAddQuestionPromise(
   questions: UpdateQuizQuestionType[],
   quizId: number
 ): Promise<void>[] {
-  console.log(questions);
+  console.log("craeting", questions);
   return questions.map((q) =>
     prisma.question
       .create({
@@ -377,6 +394,8 @@ function getAddQuestionPromise(
           question: q.question,
           mediaId: q.media,
           index: q.index,
+          time: q.time,
+          score: q.score,
           quizId,
         }),
         select: {
@@ -409,40 +428,42 @@ async function addQuestions(
   await Promise.all(getAddQuestionPromise(questions, quizId));
 }
 
-// async function deleteQuestions(questions: UpdateQuizQuestionType[]): Promise<void> {
-//   const questionsId = questions
-//     .map((q) => q.id)
-//     .filter((id: number | undefined): id is number => id !== undefined) ?? [];
+async function deleteQuestions(
+  questions: UpdateQuizQuestionType[]
+): Promise<void> {
+  const questionsId =
+    questions
+      .map((q) => q.id)
+      .filter((id: number | undefined): id is number => id !== undefined) ?? [];
 
-//     const deleteQuestionsPromise = prisma.question.updateMany({
-//     where: {
-//       id: {
-//         in: questionsId,
-//       },
-//     },
-//     data: {
-//       isDeleted: true,
-//     },
-//   });
-//   const deleteOptionsPromise = prisma.questionOption.updateMany({
-//     where: {
-//       questionId: {
-//         in: questionsId,
-//       },
-//     },
-//     data: {
-//       isDeleted: true,
-//     },
-//   });
-//   await Promise.all([deleteQuestionsPromise, deleteOptionsPromise]);
-// }
+  const deleteQuestionsPromise = prisma.question.updateMany({
+    where: {
+      id: {
+        in: questionsId,
+      },
+    },
+    data: {
+      isDeleted: true,
+    },
+  });
+  const deleteOptionsPromise = prisma.questionOption.updateMany({
+    where: {
+      questionId: {
+        in: questionsId,
+      },
+    },
+    data: {
+      isDeleted: true,
+    },
+  });
+  await Promise.all([deleteQuestionsPromise, deleteOptionsPromise]);
+}
 
 router.post("/update", updateQuizValidation, async (req, res) => {
   const quiz = res.locals.updatedQuiz as UpdateQuizType;
-  const [questionsToUpdate, questionsToAdd] = splitQuestionsToUpdatAddAndDelete(
-    quiz.questions ?? []
-  );
-  const optionsToAdd = getOptionsToAdd(questionsToAdd);
+  const [questionsToUpdate, questionsToAdd, questionsToDelete] =
+    splitQuestionsToUpdatAddAndDelete(quiz.questions ?? []);
+  const optionsToAdd = getOptionsToAdd([...questionsToAdd,...questionsToUpdate]);
   try {
     await Promise.all([
       updateBaseQuiz(quiz),
@@ -450,6 +471,7 @@ router.post("/update", updateQuizValidation, async (req, res) => {
       updateOptions(questionsToUpdate),
       addOptions(optionsToAdd),
       addQuestions(questionsToAdd, quiz.id),
+      deleteQuestions(questionsToDelete),
     ]);
     const updatedQuiz = await prisma.quiz.findUnique({
       where: {
@@ -457,14 +479,23 @@ router.post("/update", updateQuizValidation, async (req, res) => {
       },
       include: {
         questions: {
+          where: {
+            isDeleted: false,
+          },
           include: {
-            options: true,
+            options: {
+              where: {
+                isDeleted: false,
+              },
+            },
           },
         },
       },
     });
+    console.log("updatedQuiz", updatedQuiz);
     res.send(updatedQuiz);
   } catch (err) {
+    console.error(err);
     res.sendStatus(500);
   }
 });

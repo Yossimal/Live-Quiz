@@ -25,8 +25,8 @@ export type QuestionOptionType = {
   data: string;
   questionId: number;
   isCorrect: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
 };
 
 export type QuestionType = {
@@ -39,9 +39,10 @@ export type QuestionType = {
   media: string;
   createdAt: Date;
   updatedAt: Date;
-  time: number;
-  mediaId: number | null;
   index: number;
+  time: number;
+  score: number;
+  mediaId: number | null;
 };
 
 export type QuizType = {
@@ -58,7 +59,7 @@ export type QuizType = {
   _count?: {
     questions: number;
     onlineGames: number;
-  }
+  };
 };
 
 export type OnlineGameType = {

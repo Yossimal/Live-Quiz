@@ -1,6 +1,7 @@
+import { CSSProperties } from "react";
 
-
-export const addButton = {
-    bottom:"3%",
-    right:"2%"
-}
+export const addButton:CSSProperties = {
+  position: "fixed",
+  bottom: "3%",
+  right: "2%",
+};

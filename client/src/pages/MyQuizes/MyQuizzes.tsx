@@ -2,11 +2,15 @@ import { useQuery } from "react-query";
 import { useAxios } from "../../hooks/useAxios";
 import { QuizType } from "../../types/dataObjects";
 import { DataView } from "primereact/dataview";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Error from "../../components/Error";
 import Loader from "../../components/Loader"
 import QuizItem from "./QuizItem";
+import { ProgressBar } from "primereact/progressbar";
 
 export default function MyQuizzes() {
+  const navigate = useNavigate();
   const { instance } = useAxios();
 
   const { data, isLoading, isError, error } = useQuery({
@@ -14,8 +18,22 @@ export default function MyQuizzes() {
     queryFn: async () => {
       const { data } = await instance!.get<QuizType[]>("/quiz");
       return data;
-    }
-  });
+    },
+    staleTime: 1000 * 60 * 5,//set the query fresh for 5 minutes
+  }
+  );
+
+  if (isLoading)
+    return (
+      <div className="card flex align-items-center justify-content-center">
+        <ProgressBar
+          mode="indeterminate"
+          style={{ height: "6px" }}
+        ></ProgressBar>
+      </div>
+    );
+
+  if (isError) return <h1>error</h1>; //<Error error={error} />    }
 
   if (isLoading) return <Loader />
   if (isError) return <Error error={error as Error} />

@@ -13,13 +13,9 @@ function isUserType(user: unknown): user is UserType {
     "role",
   ];
   if (!user || typeof user !== "object") {
-    console.log("user is not an object");
     return false;
   }
-  console.log(Object.keys(user));
-  userParams.forEach((param) => {
-    console.log(param, param in user);
-  });
+
   return userParams.every((param) => param in user);
 }
 
