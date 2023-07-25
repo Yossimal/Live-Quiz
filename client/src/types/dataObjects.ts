@@ -39,6 +39,9 @@ export type QuestionType = {
   media: string;
   createdAt: Date;
   updatedAt: Date;
+  time: number;
+  mediaId: number | null;
+  index: number;
 };
 
 export type QuizType = {
@@ -78,3 +81,10 @@ export type TimeStampType = {
   createdAt: Date;
   updatedAt: Date;
 };
+
+
+export type AnswerResultType = {
+  playerId: number | string;
+  questionId: number;
+  isRight: boolean;
+}

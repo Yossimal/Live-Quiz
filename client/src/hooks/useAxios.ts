@@ -1,18 +1,19 @@
 import axios, { AxiosInstance } from "axios";
 import { useAuthenticate, useCredentials } from "./authHooks";
+import { useNavigate } from "react-router-dom";
 
 export function useAxios(): { instance: AxiosInstance | null } {
   const user = useCredentials();
   const { refresh } = useAuthenticate();
+  const navigate = useNavigate();
 
-  if (!user) return { instance: null };
+  if (!user) navigate('/');
 
-  //if (instance) return { instance };
   const instance = axios.create({
     baseURL: "http://localhost:3000/api/",
     timeout: 5000,
     headers: {
-      Authorization: `Bearer ${user.accessToken}`,
+      Authorization: `Bearer ${user!.accessToken}`,
     },
   });
   instance.interceptors.response.use(
@@ -23,11 +24,10 @@ export function useAxios(): { instance: AxiosInstance | null } {
       if (error.response.status === 403) {
         await refresh();
       }
-      else{
+      else {
         throw error;
       }
     }
   );
-  //setInstance(_instance);
   return { instance };
 }

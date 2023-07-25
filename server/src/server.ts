@@ -2,7 +2,6 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import express from "express";
-
 import authRoute from "./routes/auth/routh";
 import quizRoute from "./routes/quizzes/routh";
 import { connectRedis } from "./routes/auth/tokens";
@@ -10,44 +9,49 @@ import authenticate from "./middlewares/authenticate";
 import { Server } from 'socket.io'
 import http from 'http'
 import cors from "cors";
+import {
+  ServerToAdminClientEvents,
+  ServerToUserClientEvents,
+  AdminClientToServerEvents,
+  UserClientToServerEvents,
+} from './gameOnline/events';
+import { SocketData } from './gameOnline/types'
+import gameOnlinHandler from './gameOnline/gameOnlineHandler'
 
 const app = express();
 app.use(cors());
-
-const server = http.createServer(app)
-
-
 app.use(express.json());
-app.use("/auth", authRoute);
-app.use("/api/quiz", authenticate, quizRoute);
 
+app.get("/", (req, res) => {
+  res.send({ uptime: process.uptime() });
+});
 
-const port = process.env.PORT || 3000;
+const server = http.createServer(app);
 
-export const io = new Server(server, {
+export const io = new Server<
+  AdminClientToServerEvents & UserClientToServerEvents,
+  ServerToAdminClientEvents & ServerToUserClientEvents,
+  any,
+  SocketData
+>(server, {
   cors: {
-    origin: 'http://localhost:5173',
+    origin: process.env.CLIENT_URL,
     methods: ['GET', 'POST']
   }
 });
 
-// listen to socekt connections
-io.on('connection', (socket) => {
-  console.log(`user connected: ${socket.id}`);
 
-  // socket.on('open-game', id => {
-  //   socket.emit('get-token-game', id * 8);
-  // });
+app.use("/auth", authRoute);
+app.use("/api/quiz", authenticate, quizRoute);
 
-  socket.on('disconnect', (reason) => {
-    console.log(`user disconnected: ${reason}, ${socket.id}`);
-  });
-});
+io.on('connection', gameOnlinHandler);
 
+
+const port = process.env.PORT || 3000;
 
 connectRedis().then((_) => {
 
-  app.listen(port, async () => {
+  server.listen(port, async () => {
     console.log(`Server running on port ${port}`);
   });
 });

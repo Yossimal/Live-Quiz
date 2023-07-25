@@ -95,7 +95,7 @@ export default function NewQuiz() {
             icon="pi pi-save"
             label="Save"
             rounded
-            severity="success"
+            className="w-2"
             onClick={createQuiz}
           />
         </div>
