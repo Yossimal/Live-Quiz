@@ -42,6 +42,7 @@ export type QuestionType = {
   index: number;
   time: number;
   score: number;
+  mediaId: number | null;
 };
 
 export type QuizType = {
@@ -73,9 +74,18 @@ export type PlayerType = {
   score: number;
   gameId: number;
   game?: QuizType;
+  name: string;
 };
+
 
 export type TimeStampType = {
   createdAt: Date;
   updatedAt: Date;
 };
+
+
+export type AnswerResultType = {
+  playerId: number | string;
+  questionId: number;
+  isRight: boolean;
+}

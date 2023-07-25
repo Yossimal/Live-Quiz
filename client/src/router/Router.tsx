@@ -7,6 +7,9 @@ import NewQuiz from "../pages/NewQuiz/NewQuiz";
 import MyQuizzes from "../pages/MyQuizes/MyQuizzes";
 import SpecificQuiz from "../pages/SpecificQuiz/SpecificQuiz";
 import QuizEditor from "../pages/QuizEditor/QuizEditor";
+import OnlineGameAdmin from "../pages/OnlineGame/OnlineGameAdmin";
+import JoinGame from "../pages/Play/JoinGame/JoinGame";
+import PlayGame from "../pages/Play/PlayGame/PlayGame";
 
 export default function Router() {
   return (
@@ -19,6 +22,11 @@ export default function Router() {
         <Route path="quiz/new" element={<NewQuiz />} />
         <Route path="quiz/view/:id" element={<SpecificQuiz />} />
         <Route path="quiz/edit/:id" element={<QuizEditor />} />
+        <Route path="quiz/play/:id" element={<OnlineGameAdmin />} />
+      </Route>
+      <Route path='/live/quiz/:gameToken'>
+        <Route index element={<JoinGame />} />
+        <Route path='play/:playerId' element={<PlayGame />} />
       </Route>
       <Route path="*" element={<h1>404</h1>} />
     </Routes>

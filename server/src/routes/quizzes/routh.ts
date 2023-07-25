@@ -98,7 +98,7 @@ router.post("/", postValidation, async (req, res) => {
         description: quiz.description,
         name: quiz.name,
         creatorId: user.id,
-        imageId: quiz.image,
+        //imageId: quiz.image,
       },
       select: {
         id: true,
@@ -168,10 +168,10 @@ router.delete("/:id", async (req, res) => {
 
 type OptionPut =
   | {
-      id?: number;
-      data?: string;
-      isCorrect?: boolean;
-    }
+    id?: number;
+    data?: string;
+    isCorrect?: boolean;
+  }
   | undefined;
 
 function getOptions(options: OptionPut[] | undefined) {
@@ -249,10 +249,10 @@ router.put("/updateQuestion", updateQuestionValidation, async (req, res) => {
 function splitQuestionsToUpdatAddAndDelete(
   questions: UpdateQuizQuestionType[]
 ): [
-  UpdateQuizQuestionOptionType[],
-  UpdateQuizQuestionOptionType[],
-  UpdateQuizQuestionOptionType[]
-] {
+    UpdateQuizQuestionOptionType[],
+    UpdateQuizQuestionOptionType[],
+    UpdateQuizQuestionOptionType[]
+  ] {
   const questionsToUpdate = questions.filter(
     (q) => q.id !== undefined && !q.isDeleted
   );
@@ -418,35 +418,33 @@ async function addQuestions(
   await Promise.all(getAddQuestionPromise(questions, quizId));
 }
 
-async function deleteQuestions(
-  questions: UpdateQuizQuestionType[]
-): Promise<void> {
-  const questionsId =
-    questions
-      .map((q) => q.id)
-      .filter((id: number | undefined): id is number => id !== undefined) ?? [];
-  const deleteQuestionsPromise = prisma.question.updateMany({
-    where: {
-      id: {
-        in: questionsId,
-      },
-    },
-    data: {
-      isDeleted: true,
-    },
-  });
-  const deleteOptionsPromise = prisma.questionOption.updateMany({
-    where: {
-      questionId: {
-        in: questionsId,
-      },
-    },
-    data: {
-      isDeleted: true,
-    },
-  });
-  await Promise.all([deleteQuestionsPromise, deleteOptionsPromise]);
-}
+// async function deleteQuestions(questions: UpdateQuizQuestionType[]): Promise<void> {
+//   const questionsId = questions
+//     .map((q) => q.id)
+//     .filter((id: number | undefined): id is number => id !== undefined) ?? [];
+
+//     const deleteQuestionsPromise = prisma.question.updateMany({
+//     where: {
+//       id: {
+//         in: questionsId,
+//       },
+//     },
+//     data: {
+//       isDeleted: true,
+//     },
+//   });
+//   const deleteOptionsPromise = prisma.questionOption.updateMany({
+//     where: {
+//       questionId: {
+//         in: questionsId,
+//       },
+//     },
+//     data: {
+//       isDeleted: true,
+//     },
+//   });
+//   await Promise.all([deleteQuestionsPromise, deleteOptionsPromise]);
+// }
 
 router.post("/update", updateQuizValidation, async (req, res) => {
   const quiz = res.locals.updatedQuiz as UpdateQuizType;
