@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { QuestionType, QuestionOptionType } from '../types/dataObjects';
-import { SelectButton, SelectButtonChangeEvent } from 'primereact/selectbutton';
 import { Button } from 'primereact/button';
 import { ProgressBar } from 'primereact/progressbar';
 
@@ -26,16 +25,6 @@ export default function CurrentQuestionOnLiveGame({ question, onSelectedOption, 
 
     if (!question) return <></>;
 
-    const colors = ['red', 'blue', 'green', 'yellow'];
-    const colorTemplate = (option: QuestionOptionType & { color: string }) => {
-        return (
-            <Button
-                className='m-2 p-2'
-                style={{ color: option.color }}
-            />
-        )
-    }
-
     const timeTemplate = (value: number) => {
         return (
             <>
@@ -45,23 +34,22 @@ export default function CurrentQuestionOnLiveGame({ question, onSelectedOption, 
     };
 
     return (
-        <div>
-            <h1>{question.question}</h1>
-            <div className="card flex justify-content-center">
-                <SelectButton
-                    value={selectedOption}
-                    onChange={(e: SelectButtonChangeEvent) => setSelectedOption(e.value)}
-                    optionLabel="data"
-                    itemTemplate={colorTemplate}
-                    options={question.options?.map(opt => {
-                        return {
-                            ...opt,
-                            color: colors.concat().sort(() => Math.random() - 0.5)[0]
-                        }
-                    })} />
-                <div className="card">
-                    <ProgressBar value={time} displayValueTemplate={timeTemplate}></ProgressBar>
-                </div>
+        <div className='w-full shadow-2 border-round surface-card flex flex-column align-content-center justify-content-center'>
+            <h1 className='text-center'>{question.question}</h1>
+            <div className='grid'>
+                {question.options?.map(opt => {
+                    return (
+                        <div key={opt.id} className='col-6'>
+                            <Button
+                                label={opt.data}
+                                onClick={() => setSelectedOption(opt)}
+                                className='text-center p-3 border-round-sm font-bold' />
+                        </div>
+                    )
+                })}
+            </div>
+            <div className="card mt-6">
+                <ProgressBar value={time} displayValueTemplate={timeTemplate} />
             </div>
         </div>
     )

@@ -24,7 +24,7 @@ export default function Router() {
         <Route path="quiz/edit/:id" element={<QuizEditor />} />
         <Route path="quiz/play/:id" element={<OnlineGameAdmin />} />
       </Route>
-      <Route path='/live/quiz/:gameToken'>
+      <Route path='/live/game/:gameToken'>
         <Route index element={<JoinGame />} />
         <Route path='play/:playerId' element={<PlayGame />} />
       </Route>

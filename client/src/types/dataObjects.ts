@@ -73,6 +73,7 @@ export type PlayerType = {
   score: number;
   gameId: number;
   game?: QuizType;
+  gameName: string;
   name: string;
 };
 
@@ -87,4 +88,5 @@ export type AnswerResultType = {
   playerId: number | string;
   questionId: number;
   isRight: boolean;
+  score: number;
 }

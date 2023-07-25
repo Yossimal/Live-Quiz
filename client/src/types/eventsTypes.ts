@@ -1,15 +1,18 @@
-import { PlayerType, QuestionType, AnswerResultType, QuestionOptionType } from './dataObjects'
+import { PlayerType, QuestionType, AnswerResultType } from './dataObjects'
 
 export type ServerToClientEvents = {
     questionTimeuot: () => void;
     timeLeft: (time: number) => void;
     currentQuestion: (question: QuestionType) => void;
+    gameOver: () => void;
+    gameError: (error: string) => void;
 }
 
 export type ServerToAdminClientEvents = {
     getGameToken: (token: string) => void;
     newPlayer: (player: PlayerType) => void;
     totalAnswerResult: (totalResult: AnswerResultType[]) => void;
+    gameError: (error: string) => void;
 } & ServerToClientEvents;
 
 export type ServerToUserClientEvents = {
@@ -25,5 +28,5 @@ export type AdminClientToServerEvents = {
 
 export type UserClientToServerEvents = {
     joinGame: (token: string, name: string) => void;
-    submitAnswer: (answer: QuestionOptionType) => void;
+    submitAnswer: (token: string, optionId: number) => void;
 }
