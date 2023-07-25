@@ -1,9 +1,10 @@
 import { Button } from "primereact/button";
 import { QuestionOptionType } from "../../types/dataObjects";
 import QuestionOption from "./QuestionOption";
+import { randomNumberIdNeg } from "../../common/uniqueGen";
 
 type QuestionOptionListProps = {
-  optionsState: PartialState<QuestionOptionType[]>;
+  optionsState: PartialState<OptionalQuestionOptionType[]>;
 };
 
 export default function QuestionOptionList({
@@ -11,8 +12,8 @@ export default function QuestionOptionList({
 }: QuestionOptionListProps) {
   const [options, setOptions] = optionsState;
 
-  const setOption = (newOption: QuestionOptionType) => {
-    const newOptions = options.map((option: QuestionOptionType) => {
+  const setOption = (newOption: OptionalQuestionOptionType) => {
+    const newOptions = options.map((option: OptionalQuestionOptionType) => {
       if (option.id === newOption.id) {
         return newOption;
       }
@@ -23,19 +24,36 @@ export default function QuestionOptionList({
 
   const deleteOption = (id: number) => {
     const newOptions = options.filter(
-      (option: QuestionOptionType) => option.id !== id
+      (option: OptionalQuestionOptionType) => option.id !== id
     );
     setOptions(newOptions);
   };
   const optionsDOM = options.map((option) => {
-    <QuestionOption
+    return <QuestionOption
       optionState={[option, setOption]}
-      deleteOption={() => deleteOption(option.id)}
+      deleteOption={() => option.id && deleteOption(option.id)}
     />;
   });
 
-  return <>
-    {optionsDOM}
-    <Button/>
-  </>;
+  return (
+    <>
+      {optionsDOM}
+      <Button
+        label="Add Option"
+        icon="pi pi-plus"
+        className="p-button-secondary"
+        onClick={() =>
+          setOptions([
+            ...options,
+            {
+              id: randomNumberIdNeg(),
+              data: "",
+              isCorrect: false,
+              isChanged: true,
+            },
+          ])
+        }
+      />
+    </>
+  );
 }

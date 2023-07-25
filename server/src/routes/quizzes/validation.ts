@@ -111,7 +111,7 @@ export function updateQuestionValidation(
 const updateQuizQuestionOptionSchema = z
   .object({
     id: z.number().int().positive().optional(),
-    data: z.string().min(2).max(100).optional(),
+    data: z.string().min(1).max(100).optional(),
     isCorrect: z.boolean().optional(),
     isDeleted: z.boolean().optional(),
   })

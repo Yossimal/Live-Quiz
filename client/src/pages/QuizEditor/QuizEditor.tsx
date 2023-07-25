@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import QuestionPanel from "./QuestionPanel";
 import { Button } from "primereact/button";
 import { addButton } from "../../common/styles";
@@ -10,6 +10,9 @@ import { ProgressSpinner } from "primereact/progressspinner";
 import { Message } from "primereact/message";
 import { SaveQuestionRequest, SaveQuizRequest } from "../../types/api";
 import { removeUndefined } from "../../common/objectsTools";
+import { YEAR } from "../../common/consts";
+import { Toast } from "primereact/toast";
+import makePrivate from "../../router/makePrivate";
 
 type GetQuizUpdateRequestProps = {
   id: number;
@@ -20,6 +23,21 @@ type GetQuizUpdateRequestProps = {
   questionsToDelete?: number[];
 };
 
+function cleanTempIds(questions: EdibleQuestionType[]) {
+  return questions.map((q) => {
+    q.options = q.options?.map((o) => {
+      if (o.id && o.id < 0) {
+        return removeUndefined({ ...o, id: undefined });
+      }
+      return o;
+    });
+    if (q.id < 0) {
+      return removeUndefined({ ...q, id: undefined });
+    }
+    return q;
+  });
+}
+
 function getQuizUpdateRequest({
   id,
   name,
@@ -28,8 +46,9 @@ function getQuizUpdateRequest({
   questionsToUpdate,
   questionsToDelete,
 }: GetQuizUpdateRequestProps): SaveQuizRequest {
+  const cleanedQuestionsToUpdate = cleanTempIds(questionsToUpdate ?? []);
   const questionsEdible: EdibleQuestionType[] = [
-    ...(questionsToUpdate?.filter((q) => q.isChanged) ?? []),
+    ...(cleanedQuestionsToUpdate?.filter((q) => q.isChanged) ?? []),
     ...(questionsToDelete?.map((id) => ({
       id,
       isDeleted: true,
@@ -68,13 +87,14 @@ function getQuizUpdateRequest({
   };
 }
 
-export default function QuizEditor() {
+function QuizEditor() {
   const [questions, setQuestions] = useState<EdibleQuestionType[]>([]);
   const [description, setDescription] = useState<string>("");
   const [name, setName] = useState<string>("");
   const [image, setImage] = useState<string>("");
   const [error, setError] = useState<string>("");
   const [deletedQuestions, setDeletedQuestions] = useState<number[]>([]);
+  const toast = useRef<Toast>(null);
   const { id } = useParams();
   const axios = useAxios().instance;
 
@@ -105,6 +125,7 @@ export default function QuizEditor() {
           question: q.question,
           index: q.index,
           time: q.time,
+          score: q.score,
         };
       })
       .sort((a, b) => (a.index ?? 0) - (b.index ?? 0));
@@ -128,6 +149,7 @@ export default function QuizEditor() {
       if (!data) return;
       loadQuiz(data);
     },
+    staleTime: YEAR,
   });
 
   const saveQuizMutation = useMutation({
@@ -153,6 +175,14 @@ export default function QuizEditor() {
       setDeletedQuestions([]);
       if (!data) return;
       loadQuiz(data);
+      if (toast.current) {
+        toast.current.show({
+          severity: "success",
+          summary: "Success",
+          detail: "Quiz Saved Succsessfully",
+          life: 3000,
+        });
+      }
     },
   });
 
@@ -160,6 +190,9 @@ export default function QuizEditor() {
     const newQuestion: EdibleQuestionType = {
       id: new Date().getMilliseconds() * -1,
       isChanged: true,
+      time: 10,
+      index: questions.length,
+      score: 100,
     };
     setQuestions([...questions, newQuestion]);
   };
@@ -173,6 +206,31 @@ export default function QuizEditor() {
 
   const saveQuizz = () => {
     saveQuizMutation.mutate();
+  };
+
+  const sortQuestions = (questions: EdibleQuestionType[]) => {
+    return questions.sort((a, b) => (a.index ?? 0) - (b.index ?? 0));
+  };
+
+  const moveQuestionUp = (id: number) => {
+    const index = questions.findIndex((q) => q.id === id);
+    if (index > 0) {
+      const newQuestions = [...questions];
+      newQuestions[index].index = index - 1;
+      newQuestions[index - 1].index = index;
+      setQuestions(sortQuestions(newQuestions));
+    }
+  };
+
+  const moveQuestionDown = (id: number) => {
+    const index = questions.findIndex((q) => q.id === id);
+    if (index < questions.length - 1) {
+      const newQuestions = [...questions];
+      newQuestions[index].index = index + 1;
+      newQuestions[index + 1].index = index;
+
+      setQuestions(sortQuestions(newQuestions));
+    }
   };
 
   const questionsDOM = questions.map((question) => {
@@ -189,6 +247,8 @@ export default function QuizEditor() {
         questionState={questionState}
         key={question.id}
         onDelete={onDelete}
+        moveUp={moveQuestionUp}
+        moveDown={moveQuestionDown}
       />
     );
   });
@@ -213,24 +273,28 @@ export default function QuizEditor() {
 
   return (
     <>
+      <Toast ref={toast} />
       <h1>{quizQuery.data?.name}</h1>
       <div className="flex flex-column gap-2">
         {questionsDOM}
         <Button
           icon="pi pi-save"
-          label="Save"
+          label={saveQuizMutation.isLoading ? "...Saving" : "Save"}
           rounded
           severity="success"
           onClick={saveQuizz}
+          disabled={saveQuizMutation.isLoading}
         />
       </div>
-      {/* add buttons for adding new question and saving at the buttom right corner*/}
       <Button
         icon="pi pi-plus"
         style={addButton}
         className="p-button-rounded bg-primary w-4rem h-4rem p-4 font-bold"
         onClick={addQuestion}
+        disabled={saveQuizMutation.isLoading}
       />
     </>
   );
 }
+
+export default makePrivate(QuizEditor);

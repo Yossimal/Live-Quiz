@@ -1,10 +1,9 @@
 import { InputText } from "primereact/inputtext";
-import { QuestionOptionType } from "../../types/dataObjects";
 import { Checkbox } from "primereact/checkbox";
 import { Button } from "primereact/button";
 
 type QuestionOptionProps = {
-  optionState: PartialState<QuestionOptionType>;
+  optionState: PartialState<OptionalQuestionOptionType>;
   deleteOption: FullFunciton<void, []>;
 };
 
@@ -20,13 +19,27 @@ export default function QuestionOption({
         <label htmlFor="isCorrect">Correct:</label>
         <Checkbox
           id="isCorrect"
-          checked={option.isCorrect}
+          checked={option.isCorrect ?? false}
           onChange={(e) =>
-            setOption({ ...option, isCorrect: e.checked ?? false })
+            setOption({
+              ...option,
+              isCorrect: e.checked ?? false,
+              isChanged: true,
+            })
           }
         />
       </span>
-      <InputText placeholder="Enter the option text here" />
+      <InputText
+        placeholder="Enter the option text here"
+        value={option.data}
+        onChange={(e) =>
+          setOption({
+            ...option,
+            data: e.target.value,
+            isChanged: true,
+          })
+        }
+      />
       <Button
         icon="pi pi-trash"
         className="p-button-danger"

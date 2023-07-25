@@ -25,8 +25,8 @@ export type QuestionOptionType = {
   data: string;
   questionId: number;
   isCorrect: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
 };
 
 export type QuestionType = {
