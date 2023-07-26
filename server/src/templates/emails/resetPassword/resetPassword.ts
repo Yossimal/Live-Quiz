@@ -9,7 +9,7 @@ export default function resetPasswordTemplate(
   const templatePath = path.join(__dirname, "resetPassword.html");
   const templateParams = {
     name: userName,
-    link: `http://${process.env.CLIENT_URL}/resetPassword/${token}`,
+    link: `${process.env.CLIENT_URL}/resetPassword/${token}`,
   };
   return generateTemplateHtml(templatePath, templateParams).then((html) => ({
     subject: "Reset Your Password",

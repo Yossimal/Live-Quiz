@@ -1,6 +1,7 @@
 import axios, { AxiosInstance } from "axios";
 import { useAuthenticate, useCredentials } from "./authHooks";
 import { useNavigate } from "react-router-dom";
+import { SERVER_URL } from "../common/consts";
 
 export function useAxios(): { instance: AxiosInstance | null } {
   const user = useCredentials();
@@ -10,7 +11,7 @@ export function useAxios(): { instance: AxiosInstance | null } {
   if (!user) navigate('/');
 
   const instance = axios.create({
-    baseURL: "http://localhost:3000/api/",
+    baseURL: `${SERVER_URL}/api/`,
     timeout: 10000,
     headers: {
       Authorization: `Bearer ${user!.accessToken}`,

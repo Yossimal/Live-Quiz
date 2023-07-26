@@ -1,12 +1,14 @@
 import z, { ZodError } from "zod";
 import { Request, Response, NextFunction } from "express";
 
+const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
+
 const singupSchema = z.object({
   firstName: z.string().min(3),
   lastName: z.string().min(3),
   email: z.string().email(),
   birthday: z.coerce.date(),
-  password: z.string().regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/),
+  password: z.string().regex(PASSWORD_REGEX),
 });
 export type SingupData = z.infer<typeof singupSchema>;
 
@@ -96,7 +98,6 @@ export function logoutValidation(
 
     return res.status(400).send({ error: (error as ZodError).errors });
   }
-
 }
 
 export function emailVarificationValidation(
@@ -113,5 +114,58 @@ export function emailVarificationValidation(
       error:
         "There was an error in the token, try to login again to get new token.",
     });
+  }
+}
+
+const forgotPasswordSchema = z.object({
+  email: z.string().email(),
+});
+
+export function forgotPasswordValidation(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const { email } = forgotPasswordSchema.parse(req.body);
+    res.locals.email = email;
+    next();
+  } catch (error: ZodError | unknown) {
+    console.log(error);
+    res.status(400).send({ error: "The email address is not valid" });
+  }
+}
+
+const resetPasswordSchema = z.object({
+  password: z.string().regex(PASSWORD_REGEX),
+  token: z.string(),
+});
+
+export function resetPasswordValidation(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const { password, token } = resetPasswordSchema.parse(req.body);
+    res.locals.password = password;
+    res.locals.token = token;
+    next();
+  } catch (error: ZodError | unknown) {
+    if (error instanceof ZodError) {
+      if (error.errors[0].path[0] === "password") {
+        return res
+          .status(400)
+          .send({ error: "Invalid password!", fetal: false });
+      }
+      if (error.errors[0].path[0] === "token") {
+        return res.status(400).send({
+          error:
+            "The link you got is not valid. Please ask again for password reset.",
+          fetal: true,
+        });
+      }
+    }
+    res.status(500).send({ error: "An unexpected error occured" });
   }
 }
