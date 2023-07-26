@@ -46,9 +46,9 @@ export type QuestionOptionType = {
 };
 
 export enum MediaType {
-    IMAGE = "Image",
-    VIDEO = "Video",
-    NONE = "None",
+    IMAGE = "IMAGE",
+    VIDEO = "VIDEO",
+    NONE = "NONE",
 }
 
 export type QuestionType = {

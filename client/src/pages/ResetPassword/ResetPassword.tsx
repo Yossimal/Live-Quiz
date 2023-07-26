@@ -2,12 +2,12 @@ import { useRef, useState } from "react";
 import CenterCard from "../../components/CenterCard";
 import { Toast } from "primereact/toast";
 import { useParams } from "react-router-dom";
-import axios, { Axios, AxiosError } from "axios";
+import axios, { AxiosError } from "axios";
 import { SERVER_URL } from "../../common/consts";
 import { useMutation } from "react-query";
 import ResetPasswordStart from "./ResetPasswordStart";
 import { ProgressSpinner } from "primereact/progressspinner";
-import ResetPasswordSucess from "./ResetPAsswordSucess";
+import ResetPasswordSucess from "./ResetPasswordSucess";
 import ResetPasswordFail from "./ResetPasswordFail";
 
 type ResetPasswordRequestProps = {

@@ -1,0 +1,41 @@
+.wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.image {
+  filter: brightness(1);
+  width: var(--size);
+  height: auto;
+}
+
+.wrapper:hover .image {
+  filter: brightness(0.2);
+}
+
+.wrapper:hover .icon {
+  display: block;
+}
+
+.icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(0, 0, 0, 0.5);
+  color: aliceblue;
+  border-radius: 50%;
+  display: none;
+}
+
+@media (max-width: 768px) and (min-width: 481px) {
+  .image {
+    width: var(--size-md);
+  }
+}
+
+@media (max-width: 480px) {
+  .image {
+    width: var(--size-sm);
+  }
+}

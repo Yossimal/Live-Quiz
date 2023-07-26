@@ -5,6 +5,7 @@ import express from "express";
 import authRoute from "./routes/auth/routh";
 import quizRoute from "./routes/quizzes/routh";
 import { connectRedis } from "./routes/auth/tokens";
+import mediaRoute from "./routes/media/routh";
 import authenticate from "./middlewares/authenticate";
 import { Server } from 'socket.io'
 import http from 'http'
@@ -43,6 +44,7 @@ export const io = new Server<
 
 app.use("/auth", authRoute);
 app.use("/api/quiz", authenticate, quizRoute);
+app.use("/api/media", authenticate, mediaRoute);
 
 io.on('connection', gameOnlinHandler);
 

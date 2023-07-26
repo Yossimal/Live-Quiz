@@ -18,7 +18,7 @@ router.get("/", skipTakeValidation, async (req, res) => {
   const user = res.locals.user;
   const { skip, take } = res.locals.skipTake;
   if (!user) return res.sendStatus(401);
-
+  console.log("user", user);
   const games = await prisma.quiz.findMany({
     where: {
       creatorId: user.id,
@@ -29,7 +29,7 @@ router.get("/", skipTakeValidation, async (req, res) => {
     include: {
       _count: {
         select: {
-          questions: true,
+          questions: {where: {isDeleted: false}},
           onlineQuizzes: true,
         },
       },
