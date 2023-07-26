@@ -1,6 +1,4 @@
-import { InputText } from "primereact/inputtext";
 import CenterCard from "../../components/CenterCard";
-import { Button } from "primereact/button";
 import axios, { AxiosError } from "axios";
 import { SERVER_URL } from "../../common/consts";
 import { useMutation } from "react-query";

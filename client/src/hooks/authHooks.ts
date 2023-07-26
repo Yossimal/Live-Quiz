@@ -1,7 +1,7 @@
 import { useSession } from "./useSession";
 import userSerializer from "../data/serialization/userSerializer";
 import { UserType } from "../types/dataObjects";
-import axios, { Axios, AxiosError, AxiosInstance } from "axios";
+import axios, { AxiosError, AxiosInstance } from "axios";
 import { LoginMutation, SingupData } from "../types/auth";
 import { LoginResponse } from "../types/api";
 import { SERVER_URL } from "../common/consts";
