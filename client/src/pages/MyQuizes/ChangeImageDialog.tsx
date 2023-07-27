@@ -3,7 +3,6 @@ import {
   FileUpload,
   FileUploadHandlerEvent,
   FileUploadHeaderTemplateOptions,
-  ItemTemplateOptions,
 } from "primereact/fileupload";
 import { useRef } from "react";
 
@@ -29,7 +28,7 @@ function isFileUploadFile(file: any): file is FileUploadFile {
   return file && file.objectURL && file.name;
 }
 
-function bodyTemplate(file: object, options: ItemTemplateOptions) {
+function bodyTemplate(file: object) {
   if (!isFileUploadFile(file)) {
     return <div>error</div>;
   }

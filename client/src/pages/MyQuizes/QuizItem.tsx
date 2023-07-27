@@ -6,7 +6,7 @@ import quizImgPlaceholder from "../../assets/quiz-placeholder.jpg";
 import ChangeImageDialog from "./ChangeImageDialog";
 import { useState } from "react";
 import QuizImage from "./QuizImage";
-import { useMutation } from "react-query";
+import { useMutation, useQueryClient } from "react-query";
 import { useAxios } from "../../hooks/useAxios";
 import { ProgressSpinner } from "primereact/progressspinner";
 
@@ -18,6 +18,7 @@ export default function QuizItem({ quiz }: QuizItemProps) {
   const navigate = useNavigate();
   const dialogVisible = useState(false);
   const instance = useAxios().instance;
+  const queryClient = useQueryClient();
 
   type ChangeImageMutationVariables = {
     quizId: number;
@@ -34,6 +35,9 @@ export default function QuizItem({ quiz }: QuizItemProps) {
     mutationFn: async ({ quizId, file }: ChangeImageMutationVariables) =>
       handleChangeImageRequest(quizId, file),
     mutationKey: ["my-quizzes", quiz.id],
+    onSuccess: () => {
+      queryClient.invalidateQueries(["my-quizzes"]);
+    },
   });
 
   const changeImage = async (file: File) => {
