@@ -24,7 +24,7 @@ export default function OnlineGameAdmin() {
     const [currentQuestion, setCurrentQuestion] = useState<QuestionType | null>(null);
     const [answerResults, setAnswerResults] = useState<AnswerResultType[]>([]);
 
-    const [gameData, setGameData] = useSession<GameData>('gameData', null as unknown as GameData);
+    const [gameData, setGameData] = useSession<GameData | null>('gameData', null);
     const [gameToken, setGameToken] = useLocalStorage('gameToken', '');
 
     let plyersScore: { playerName: string, score: number }[] = [];
@@ -111,8 +111,10 @@ export default function OnlineGameAdmin() {
 
     console.log(`http://localhost:5173/live/game/${gameToken}`);
 
+    if (!gameData) return (<div>loading...</div>);
+
     return (
-        <div className='flex h-full flex-column justify-content-start align-items-center bg-purple-800'>
+        <div className='flex h-full flex-column align-items-center bg-purple-800'>
             {!gameStarted &&
                 <div className='m-3 flex flex-column justify-content-center align-items-center'>
                     <div className='text-6xl text-blue-100 font-bold mb-3'>Scaen To Join To The
@@ -132,7 +134,7 @@ export default function OnlineGameAdmin() {
                 onClick={() => adimnSocket.emit('startGame', gameToken)}
             />}
 
-            <div className='w-6'>
+            <div className=''>
                 {currentQuestion &&
                     <LiveGame
                         gameData={gameData}
