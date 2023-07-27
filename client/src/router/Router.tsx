@@ -30,6 +30,7 @@ export default function Router() {
         <Route path="quiz/view/:id" element={<SpecificQuiz />} />
         <Route path="quiz/edit/:id" element={<QuizEditor />} />
         <Route path="quiz/play/:id" element={<OnlineGameAdmin />} />
+        <Route path="profile" element={<UserProfile />} />
       </Route>
       <Route path="/live/game/:gameToken">
         <Route index element={<JoinGame />} />

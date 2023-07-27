@@ -46,11 +46,6 @@ export default function SidebarMenu() {
                     label: 'My Quizzes',
                     icon: 'pi pi-fw pi-list',
                     url: '/home/quiz/my'
-                },
-                {
-                    label: 'Shaerd With Me',
-                    icon: 'pi pi-fw pi-share-alt',
-                    url: '/home/quiz/shared'
                 }
             ]
         },
@@ -62,11 +57,6 @@ export default function SidebarMenu() {
                     label: 'Profile',
                     icon: 'pi pi-fw pi-user-edit',
                     url: '/home/profile'
-                },
-                {
-                    label: 'Settings',
-                    icon: 'pi pi-fw pi-cog',
-                    url: '/home/settings'
                 }
             ]
         },
