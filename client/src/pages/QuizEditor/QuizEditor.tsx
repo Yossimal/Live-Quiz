@@ -42,7 +42,6 @@ function getQuizUpdateRequest({
   id,
   name,
   description,
-  image,
   questionsToUpdate,
   questionsToDelete,
 }: GetQuizUpdateRequestProps): SaveQuizRequest {
@@ -63,7 +62,6 @@ function getQuizUpdateRequest({
   const questions: SaveQuestionRequest[] = questionsEdibleUnique.map((q) =>
     removeUndefined({
       id: q.id,
-      media: q.media,
       options: q.options
         ?.filter((o) => o.isChanged)
         .map((o) => ({
@@ -83,7 +81,6 @@ function getQuizUpdateRequest({
     id,
     name,
     description,
-    image,
     questions,
   };
 }

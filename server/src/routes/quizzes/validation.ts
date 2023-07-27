@@ -108,7 +108,7 @@ export function updateQuestionValidation(
   }
 }
 
-const updateQuizQuestionOptionSchema = z
+const updateQuizQuestionOptionSchema:any = z
   .object({
     id: z.number().int().positive().optional(),
     data: z.string().min(1).max(100).optional(),
@@ -123,7 +123,7 @@ const updateQuizQuestionOptionSchema = z
     }
   );
 
-const updateQuizQuestionSchema = z
+const updateQuizQuestionSchema:any = z
   .object({
     id: z.number().int().positive().optional(),
     question: z.string().min(2).max(100).optional(),

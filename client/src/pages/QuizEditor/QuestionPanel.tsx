@@ -2,10 +2,8 @@ import { Panel, PanelHeaderTemplateOptions } from "primereact/panel";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { Toolbar } from "primereact/toolbar";
-import { InputNumber } from "primereact/inputnumber";
 import NumberInput from "./NumberInput";
 import QuestionOptionList from "./QuestionOptionList";
-import { QuestionOptionType } from "../../types/dataObjects";
 import { Divider } from "primereact/divider";
 
 type QuestionPanelProps = {
@@ -120,18 +118,18 @@ export default function QuestionPanel({
     setQuestion({ ...question, options: newOptions, isChanged: true });
   };
 
-  const headerTemplate = (options: any) => (
-    <PanelHeaderTemplate
+  const headerTemplate = (options: any) => {
+    return <PanelHeaderTemplate
       questionText={question.question}
       onDelete={() => onDelete(question.id)}
       options={options}
       moveUp={() => moveUp(question.id)}
       moveDown={() => moveDown(question.id)}
     />
-  );
+};
 
   return (
-    <Panel className="surface mb-2 shadow-3 border-round" headerTemplate={headerTemplate} toggleable>
+    <Panel className="surface mb-2 shadow-3 border-round" headerTemplate={headerTemplate} collapsed toggleable>
       <div className="flex flex-column gap-2">
         <div className="flex flex-column gap-2 align-items-center justify-content-center ">
           <div className="flex align-items-center w-full justify-content-start gap-3 align-self-start">
