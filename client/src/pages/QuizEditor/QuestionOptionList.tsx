@@ -23,16 +23,22 @@ export default function QuestionOptionList({
   };
 
   const deleteOption = (id: number) => {
-    const newOptions = options.filter(
-      (option: OptionalQuestionOptionType) => option.id !== id
+    const optionIndex = options.findIndex(
+      (option: OptionalQuestionOptionType) => option.id === id
     );
+    const newOptions = [...options];
+    newOptions[optionIndex].isDeleted = true;
+    newOptions[optionIndex].isChanged = true;
     setOptions(newOptions);
   };
-  const optionsDOM = options.map((option) => {
-    return <QuestionOption
-      optionState={[option, setOption]}
-      deleteOption={() => option.id && deleteOption(option.id)}
-    />;
+  const optionsDOM = options.filter(o=>!o.isDeleted).map((option) => {
+    return (
+      <QuestionOption
+        key={option.id}
+        optionState={[option, setOption]}
+        deleteOption={() => option.id && deleteOption(option.id)}
+      />
+    );
   });
 
   return (

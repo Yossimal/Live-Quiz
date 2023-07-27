@@ -9,7 +9,7 @@ export default function varificationEmailTemplate(
   const templatePath = path.join(__dirname, "varification.html");
   const templateParams = {
     name: userName,
-    link: `http://${process.env.CLIENT_URL}/varifyEmail/${token}`,
+    link: `${process.env.CLIENT_URL}/varifyEmail/${token}`,
   };
   return generateTemplateHtml(templatePath, templateParams).then((html) => ({
     subject: "Varify your email",

@@ -1,9 +1,10 @@
 import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { SERVER_URL } from "../../common/consts";
 
 function validateEmail(token: string) {
-  return axios.post("http://localhost:3000/auth/varifyEmail", { token });
+  return axios.post(`${SERVER_URL}/auth/varifyEmail`, { token });
 }
 
 export default function VarifyEmail() {

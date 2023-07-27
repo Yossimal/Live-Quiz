@@ -10,6 +10,8 @@ import QuizEditor from "../pages/QuizEditor/QuizEditor";
 import OnlineGameAdmin from "../pages/OnlineGame/OnlineGameAdmin";
 import JoinGame from "../pages/Play/JoinGame/JoinGame";
 import PlayGame from "../pages/Play/PlayGame/PlayGame";
+import ResetPasswordRequest from "../pages/ResetPasswordRequest/ResetPasswordRequest";
+import ResetPassword from "../pages/ResetPassword/ResetPassword";
 
 export default function Router() {
   return (
@@ -17,6 +19,8 @@ export default function Router() {
       <Route path="/" element={<Login />} />
       <Route path="/signup" element={<Singup />} />
       <Route path="/varifyEmail/:token" element={<VarifyEmail />} />
+      <Route path="/resetPassword" element={<ResetPasswordRequest />} />
+      <Route path="/resetPassword/:token" element={<ResetPassword />} />
       <Route path="/home/*" element={<Home />}>
         <Route path="quiz/my" element={<MyQuizzes />} />
         <Route path="quiz/new" element={<NewQuiz />} />
@@ -24,7 +28,7 @@ export default function Router() {
         <Route path="quiz/edit/:id" element={<QuizEditor />} />
         <Route path="quiz/play/:id" element={<OnlineGameAdmin />} />
       </Route>
-      <Route path='/live/game/:gameToken'>
+      <Route path="/live/game/:gameToken">
         <Route index element={<JoinGame />} />
         <Route path='play/:playerName' element={<PlayGame />} />
       </Route>

@@ -1,16 +1,13 @@
-import { useQuery } from "react-query";
+import { useMutation, useQuery } from "react-query";
 import { useAxios } from "../../hooks/useAxios";
 import { QuizType } from "../../types/dataObjects";
 import { DataView } from "primereact/dataview";
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import Error from "../../components/Error";
-import Loader from "../../components/Loader"
+import Loader from "../../components/Loader";
 import QuizItem from "./QuizItem";
 import { ProgressBar } from "primereact/progressbar";
 
 export default function MyQuizzes() {
-  const navigate = useNavigate();
   const { instance } = useAxios();
 
   const { data, isLoading, isError, error } = useQuery({
@@ -19,9 +16,10 @@ export default function MyQuizzes() {
       const { data } = await instance!.get<QuizType[]>("/quiz");
       return data;
     },
-    staleTime: 1000 * 60 * 5,//set the query fresh for 5 minutes
-  }
-  );
+    staleTime: 1000 * 60 * 5, //set the query fresh for 5 minutes
+  });
+
+
 
   if (isLoading)
     return (
@@ -35,8 +33,8 @@ export default function MyQuizzes() {
 
   if (isError) return <h1>error</h1>; //<Error error={error} />    }
 
-  if (isLoading) return <Loader />
-  if (isError) return <Error error={error as Error} />
+  if (isLoading) return <Loader />;
+  if (isError) return <Error error={error as Error} />;
   if (!data) return <h1>no data</h1>;
 
   return (
@@ -46,11 +44,10 @@ export default function MyQuizzes() {
         <DataView
           value={data}
           itemTemplate={(quiz: QuizType) => {
-            return <QuizItem quiz={quiz} />;
+            return <QuizItem quiz={quiz}  />;
           }}
         />
       </div>
-
     </>
   );
 }

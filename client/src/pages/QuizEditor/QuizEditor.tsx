@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import QuestionPanel from "./QuestionPanel";
 import { Button } from "primereact/button";
 import { addButton } from "../../common/styles";
-import { useMutation, useQuery } from "react-query";
+import { useMutation, useQuery, useQueryClient } from "react-query";
 import { QuizType } from "../../types/dataObjects";
 import { useParams } from "react-router-dom";
 import { useAxios } from "../../hooks/useAxios";
@@ -70,6 +70,7 @@ function getQuizUpdateRequest({
           data: o.data,
           id: o.id,
           isCorrect: o.isCorrect,
+          isDeleted: o.isDeleted,
         })),
       question: q.question,
       index: q.index,
@@ -97,6 +98,7 @@ function QuizEditor() {
   const toast = useRef<Toast>(null);
   const { id } = useParams();
   const axios = useAxios().instance;
+  const queryClient = useQueryClient();
 
   if (!error && (!id || !Number.isInteger(id))) {
     setError(
@@ -119,7 +121,7 @@ function QuizEditor() {
               isChanged: false,
               data: o.data,
               id: o.id,
-              isCorrect: o.isCorrect,
+              isCorrect: o.isCorrect
             })
           ),
           question: q.question,
@@ -158,6 +160,7 @@ function QuizEditor() {
       if (!axios) {
         throw new Error("An unexpected error occured. try again later.");
       }
+      console.log(questions);
       const response = await axios.post<QuizType>(
         "/quiz/update",
         getQuizUpdateRequest({
@@ -174,6 +177,7 @@ function QuizEditor() {
     onSuccess(data) {
       setDeletedQuestions([]);
       if (!data) return;
+      queryClient.setQueryData(["my-quizzes", id], data);
       loadQuiz(data);
       if (toast.current) {
         toast.current.show({
@@ -198,9 +202,11 @@ function QuizEditor() {
   };
 
   const onDelete = (id: number) => {
+    console.log("deleting question", id);
     setQuestions((prev) => prev.filter((q) => q.id !== id));
     if (id >= 0) {
       setDeletedQuestions((prev) => [...prev, id]);
+      console.log("deleted questions", deletedQuestions);
     }
   };
 

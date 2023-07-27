@@ -158,7 +158,7 @@ export default function Login() {
               <label htmlFor="remember">Remember me</label>
 
             </div>
-            <Link to="/" className="font-medium no-underline ml-2 text-blue-500 text-right cursor-pointer">Forgot your password?</Link>
+            <Link to="/resetPassword" className="font-medium no-underline ml-2 text-blue-500 text-right cursor-pointer">Forgot your password?</Link>
 
           </div>
           <Button type="submit" label="Login" className={`${!loading ? 'block' : 'hidden'} p-mt-2`} />

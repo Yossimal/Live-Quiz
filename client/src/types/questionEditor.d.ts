@@ -2,6 +2,7 @@ type OptionalQuestionOptionType = {
   isChanged: boolean;
   id?: number;
   data?: string;
+  isDeleted?: boolean;
   isCorrect?: boolean;
 };
 

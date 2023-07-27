@@ -1,12 +1,13 @@
 import { useSession } from "./useSession";
 import userSerializer from "../data/serialization/userSerializer";
 import { UserType } from "../types/dataObjects";
-import axios, { Axios, AxiosError, AxiosInstance } from "axios";
+import axios, { AxiosError, AxiosInstance } from "axios";
 import { LoginMutation, SingupData } from "../types/auth";
 import { LoginResponse } from "../types/api";
+import { SERVER_URL } from "../common/consts";
 
 const authAxiosInstance: AxiosInstance = axios.create({
-  baseURL: "http://localhost:3000/auth/",
+  baseURL: `${SERVER_URL}/auth/`,
   timeout: 10000,
 });
 
@@ -42,8 +43,7 @@ export function useAuthenticate() {
       }
       return "An unexpected error occured";
     } catch (err) {
-      if (err instanceof AxiosError
-        && err.response?.data?.error) {
+      if (err instanceof AxiosError && err.response?.data?.error) {
         const error = err.response.data.error;
         return error;
       }
