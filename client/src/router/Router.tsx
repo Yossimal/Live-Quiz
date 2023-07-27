@@ -13,6 +13,7 @@ import PlayGame from "../pages/Play/PlayGame/PlayGame";
 import ResetPasswordRequest from "../pages/ResetPasswordRequest/ResetPasswordRequest";
 import ResetPassword from "../pages/ResetPassword/ResetPassword";
 import 'primereact/resources/themes/tailwind-light/theme.css'
+import UserProfile from "../pages/PlayerProfile/UserProfile";
 
 export default function Router() {
 
