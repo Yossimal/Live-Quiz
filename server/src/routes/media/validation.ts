@@ -6,11 +6,7 @@ const uploadQuizImage = z.object({
   extention: z.string().regex(/(png|jpg|jpeg|gif)/),
 });
 
-export function uploadQuizImageValidation(
-  req: Request,
-  res: Response,
-  next: NextFunction
-) {
+export function uploadQuizImageValidation(req: Request, res: Response, next: NextFunction) {
   try {
     const { quizId } = uploadQuizImage.parse(req.body);
     res.locals.quizId = quizId;

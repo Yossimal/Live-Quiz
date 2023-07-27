@@ -1,12 +1,8 @@
 import { useParams } from 'react-router-dom';
 import { useEffect, useState, useRef } from 'react';
-import { useAxios } from '../../hooks/useAxios';
-import { useQuery } from 'react-query';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
-import { PlayerType, QuestionType, QuizType, AnswerResultType, GameData } from '../../types/dataObjects';
+import { PlayerType, QuestionType, AnswerResultType, GameData } from '../../types/dataObjects';
 import { adimnSocket } from '../../common/sockets'
-import Error from "../../components/Error";
-import Loader from "../../components/Loader"
 import { Button } from 'primereact/button';
 import { Tooltip } from 'primereact/tooltip';
 import QRCode from 'react-qr-code';
@@ -20,25 +16,16 @@ import { Column } from 'primereact/column';
 
 export default function OnlineGameAdmin() {
     const { id } = useParams<{ id: string }>();
-    const { instance } = useAxios();
     const toast = useRef<Toast>(null);
 
     const [players, setPlayers] = useState<PlayerType[]>();
-    const [gameToken, setGameToken] = useLocalStorage('gameToken', '');
     const [timeLeft, setTimeLeft] = useState<number>(0);
     const [gameStarted, setGameStarted] = useState<boolean>(false);
     const [currentQuestion, setCurrentQuestion] = useState<QuestionType | null>(null);
     const [answerResults, setAnswerResults] = useState<AnswerResultType[]>([]);
-    const [gameData, setGameData] = useSession<GameData>('gameData', null as unknown as GameData);
 
-    const { data, isLoading, isError, error } = useQuery({
-        queryKey: ['online-game'],
-        queryFn:
-            async () => {
-                const { data } = await instance!.get<QuizType>(`/quiz/${id}`);
-                return data;
-            }
-    });
+    const [gameData, setGameData] = useSession<GameData>('gameData', null as unknown as GameData);
+    const [gameToken, setGameToken] = useLocalStorage('gameToken', '');
 
     let plyersScore: { playerName: string, score: number }[] = [];
     useEffect(() => {
@@ -50,8 +37,6 @@ export default function OnlineGameAdmin() {
         });
     }, [players, answerResults]);
 
-
-
     const onConnect = () => {
         if (!id) return;
         const quizId = parseInt(id);
@@ -62,6 +47,7 @@ export default function OnlineGameAdmin() {
     const onGetGameToken = (token: string) => {
         console.log(`token: ${token}`);
         setGameToken(token);
+        adimnSocket.emit('getGameData', token);
     }
 
     const onNewPlayer = (player: PlayerType) => {
@@ -123,13 +109,6 @@ export default function OnlineGameAdmin() {
         }
     }, []);
 
-
-    if (isLoading) return <Loader />
-    if (isError) return <Error error={error as Error} />
-    if (!data) return <h1>no data</h1>;
-
-    const quiz = data;
-
     console.log(`http://localhost:5173/live/game/${gameToken}`);
 
     return (
@@ -137,7 +116,7 @@ export default function OnlineGameAdmin() {
             {!gameStarted &&
                 <div className='m-3 flex flex-column justify-content-center align-items-center'>
                     <div className='text-6xl text-blue-100 font-bold mb-3'>Scaen To Join To The
-                        {<span className='text-purple-100 text-6xl font-bold mb-3'> {quiz.name}</span>} Quiz:</div>
+                        {<span className='text-purple-100 text-6xl font-bold mb-3'> {gameData.name}</span>} Quiz:</div>
                     <Tooltip target=".qrcode" mouseTrack mouseTrackLeft={10} />
                     <QRCode
                         data-pr-tooltip={`http://localhost:5173/live/game/${gameToken}`}

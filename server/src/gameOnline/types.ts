@@ -7,7 +7,7 @@ import {
 } from './events';
 
 export type AnswerResult = {
-    playerId: number;
+    playerId: string;
     questionId: number;
     option: QuestionOptionType;
     isRight: boolean;
@@ -23,7 +23,7 @@ export type GameData = {
 }
 
 export type Player = {
-    id: number;
+    id: string;
     name: string;
     score: number;
     gameId: number;

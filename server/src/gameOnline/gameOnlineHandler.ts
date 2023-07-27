@@ -69,7 +69,7 @@ export default function gameOnlinHandler(socket: MySocket) {
         }
         const player: PlayerInGame = {
             name,
-            id: 0,
+            id: '',
             score: 0,
             gameId: game.quiz.id,
             gameName: game.quiz.name,
@@ -115,9 +115,10 @@ async function getQuiz(quizId: number, socket: MySocket) {
         socket.emit('gameError', 'quiz not found');
         return;
     }
-    const questions = quiz.questions.map(q => {
+    const questions = quiz.questions.map((q, i) => {
         const question: QuestionType = {
             ...q,
+            index: i,
             options: q.options.map(o => {
                 const option: QuestionOptionType = {
                     ...o
