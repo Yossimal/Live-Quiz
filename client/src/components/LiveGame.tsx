@@ -12,7 +12,7 @@ type Props = {
 
 export default function LiveGame({ gameData, question, onSelectedOption, time }: Props) {
     return (
-        <div className="surface-100 p-3">
+        <div className="surface-100 p-3 w-10">
             <div className="flex justify-content-between">
                 <div className="flex flex-row gap-2 align-items-center ">
                     <i className="pi pi-spin pi-clock"></i>

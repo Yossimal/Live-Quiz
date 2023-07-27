@@ -32,9 +32,9 @@ export default function OnlineGameAdmin() {
   );
   const [answerResults, setAnswerResults] = useState<AnswerResultType[]>([]);
 
-  const [gameData, setGameData] = useSession<GameData>(
+  const [gameData, setGameData] = useSession<GameData | null>(
     "gameData",
-    null as unknown as GameData
+    null
   );
   const [gameToken, setGameToken] = useLocalStorage("gameToken", "");
 
@@ -121,32 +121,22 @@ export default function OnlineGameAdmin() {
     };
   }, []);
 
-  if (!gameData) return <ProgressSpinner />;
+    console.log(`http://localhost:5173/live/game/${gameToken}`);
+    if(!gameToken) return <ProgressSpinner className='m-5' />
 
-  console.log(`${CLIENT_URL}/live/game/${gameToken}`);
-
-  return (
-    <div className="flex h-full flex-column justify-content-start align-items-center bg-purple-800">
-      {!gameStarted && (
-        <div className="m-3 flex flex-column justify-content-center align-items-center">
-          <div className="text-6xl text-blue-100 font-bold mb-3">
-            Scaen To Join To The
-            {
-              <span className="text-purple-100 text-6xl font-bold mb-3">
-                {" "}
-                {gameData.name}
-              </span>
-            }{" "}
-            Quiz:
-          </div>
-          <Tooltip target=".qrcode" mouseTrack mouseTrackLeft={10} />
-          <QRCode
-            data-pr-tooltip={`${CLIENT_URL}/live/game/${gameToken}`}
-            className="qrcode surface-200 shadow-8 m-4"
-            value={`${CLIENT_URL}/live/game/${gameToken}`}
-          />
-        </div>
-      )}
+    return (
+        <div className='flex h-full flex-column justify-content-start align-items-center bg-purple-800'>
+            {!gameStarted &&
+                <div className='m-3 flex flex-column justify-content-center align-items-center'>
+                    <div className='text-6xl text-blue-100 font-bold mb-3'>Scaen To Join To The
+                        {<span className='text-purple-100 text-6xl font-bold mb-3'> {gameData.name}</span>} Quiz:</div>
+                    <Tooltip target=".qrcode" mouseTrack mouseTrackLeft={10} />
+                    <QRCode
+                        data-pr-tooltip={`http://localhost:5173/live/game/${gameToken}`}
+                        className='qrcode surface-200 shadow-8 m-4'
+                        value={`http://localhost:5173/live/game/${gameToken}`} />
+                </div>
+            }
 
       {!gameStarted && (
         <Button
@@ -157,15 +147,14 @@ export default function OnlineGameAdmin() {
         />
       )}
 
-      <div className="w-6">
-        {currentQuestion && (
-          <LiveGame
-            gameData={gameData}
-            question={currentQuestion}
-            time={timeLeft}
-          />
-        )}
-      </div>
+            <div className='w-6'>
+                {currentQuestion &&
+                    <LiveGame
+                        gameData={gameData}
+                        question={currentQuestion}
+                        time={timeLeft} />
+                }
+            </div>
 
       {plyersScore.length > 0 && (
         <DataTable value={plyersScore}>
