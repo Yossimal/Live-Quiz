@@ -7,21 +7,22 @@ import quizRoute from "./routes/quizzes/routh";
 import { connectRedis } from "./routes/auth/tokens";
 import mediaRoute from "./routes/media/routh";
 import authenticate from "./middlewares/authenticate";
-import { Server } from 'socket.io'
-import http from 'http'
+import { Server } from "socket.io";
+import privateAuthRoute from "./routes/privateAuth/routh";
+import http from "http";
 import cors from "cors";
 import {
   ServerToAdminClientEvents,
   ServerToUserClientEvents,
   AdminClientToServerEvents,
   UserClientToServerEvents,
-} from './gameOnline/events';
+} from "./gameOnline/events";
 import mediaGetRoute from "./routes/mediaGet/routh";
-import { SocketData } from './gameOnline/types'
-import gameOnlinHandler from './gameOnline/gameOnlineHandler'
+import { SocketData } from "./gameOnline/types";
+import gameOnlinHandler from "./gameOnline/gameOnlineHandler";
 
 const app = express();
-app.use(cors({ origin: process.env.CLIENT_URL}));
+app.use(cors({ origin: process.env.CLIENT_URL }));
 app.use(express.json());
 
 app.get("/", (req, res) => {
@@ -38,23 +39,21 @@ export const io = new Server<
 >(server, {
   cors: {
     origin: process.env.CLIENT_URL,
-    methods: ['GET', 'POST']
-  }
+    methods: ["GET", "POST"],
+  },
 });
-
 
 app.use("/auth", authRoute);
 app.use("/api/quiz", authenticate, quizRoute);
 app.use("/api/media", authenticate, mediaRoute);
-app.use("/media",mediaGetRoute)
+app.use("/media", mediaGetRoute);
+app.use("/api/auth", authenticate, privateAuthRoute);
 
-io.on('connection', gameOnlinHandler);
-
+io.on("connection", gameOnlinHandler);
 
 const port = process.env.PORT || 3000;
 
 connectRedis().then((_) => {
-
   server.listen(port, async () => {
     console.log(`Server running on port ${port}`);
   });

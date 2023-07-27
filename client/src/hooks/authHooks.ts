@@ -5,6 +5,7 @@ import axios, { AxiosError, AxiosInstance } from "axios";
 import { LoginMutation, SingupData } from "../types/auth";
 import { LoginResponse } from "../types/api";
 import { SERVER_URL } from "../common/consts";
+import { removeUndefined } from "../common/objectsTools";
 
 const authAxiosInstance: AxiosInstance = axios.create({
   baseURL: `${SERVER_URL}/auth/`,
@@ -38,7 +39,7 @@ export function useAuthenticate() {
           refreshToken: user.refreshToken,
         };
         setUser(newUser);
-        console.log("Good login", user);
+        // console.log("Good login", user);
         return "";
       }
       return "An unexpected error occured";
@@ -110,7 +111,23 @@ export function useAuthenticate() {
     throw new Error("An unexpected error occured");
   };
 
-  return { login, signup, logout, refresh };
+  type UpdateDataVariables = {
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+  };
+
+  const updateData = (data: UpdateDataVariables): void => {
+    if (!user) return;
+    const dataToSet = removeUndefined(data);
+    const newUser: UserType = {
+      ...user,
+      ...dataToSet,
+    };
+    setUser(newUser);
+  };
+
+  return { login, signup, logout, refresh,updateData };
 }
 
 export function useLogin() {

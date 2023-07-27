@@ -1,7 +1,7 @@
 import z, { ZodError } from "zod";
 import { Request, Response, NextFunction } from "express";
 
-const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
+export const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
 
 const singupSchema = z.object({
   firstName: z.string().min(3),
@@ -169,3 +169,4 @@ export function resetPasswordValidation(
     res.status(500).send({ error: "An unexpected error occured" });
   }
 }
+

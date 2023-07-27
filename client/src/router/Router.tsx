@@ -15,6 +15,7 @@ import ResetPassword from "../pages/ResetPassword/ResetPassword";
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import 'primereact/resources/themes/tailwind-light/theme.css'
+import UserProfile from "../pages/PlayerProfile/UserProfile";
 
 export default function Router() {
   const { pathname } = useLocation();
@@ -43,6 +44,7 @@ export default function Router() {
         <Route path="/home/*" element={<Home />}>
           <Route path="quiz/my" element={<MyQuizzes />} />
           <Route path="quiz/new" element={<NewQuiz />} />
+          <Route path="profile" element={<UserProfile/>}/>
           <Route path="quiz/view/:id" element={<SpecificQuiz />} />
           <Route path="quiz/edit/:id" element={<QuizEditor />} />
           <Route path="quiz/play/:id" element={<OnlineGameAdmin />} />
