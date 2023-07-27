@@ -3,7 +3,6 @@ import {
   FileUpload,
   FileUploadHandlerEvent,
   FileUploadHeaderTemplateOptions,
-  FileUploadUploadEvent,
   ItemTemplateOptions,
 } from "primereact/fileupload";
 import { useRef } from "react";

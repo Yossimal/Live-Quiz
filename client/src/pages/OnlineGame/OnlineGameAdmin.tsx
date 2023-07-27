@@ -121,8 +121,8 @@ export default function OnlineGameAdmin() {
     };
   }, []);
 
-    console.log(`http://localhost:5173/live/game/${gameToken}`);
-    if(!gameToken) return <ProgressSpinner className='m-5' />
+    console.log(`${CLIENT_URL}/live/game/${gameToken}`);
+    if(!gameData) return <ProgressSpinner className='m-5' />
 
     return (
         <div className='flex h-full flex-column justify-content-start align-items-center bg-purple-800'>
@@ -132,9 +132,9 @@ export default function OnlineGameAdmin() {
                         {<span className='text-purple-100 text-6xl font-bold mb-3'> {gameData.name}</span>} Quiz:</div>
                     <Tooltip target=".qrcode" mouseTrack mouseTrackLeft={10} />
                     <QRCode
-                        data-pr-tooltip={`http://localhost:5173/live/game/${gameToken}`}
+                        data-pr-tooltip={`${CLIENT_URL}/live/game/${gameToken}`}
                         className='qrcode surface-200 shadow-8 m-4'
-                        value={`http://localhost:5173/live/game/${gameToken}`} />
+                        value={`${CLIENT_URL}/live/game/${gameToken}`} />
                 </div>
             }
 
