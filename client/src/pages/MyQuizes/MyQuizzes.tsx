@@ -5,7 +5,7 @@ import { DataView } from "primereact/dataview";
 import Error from "../../components/Error";
 import Loader from "../../components/Loader";
 import QuizItem from "./QuizItem";
-import { ProgressBar } from "primereact/progressbar";
+import { SERVER_URL } from "../../common/consts";
 
 export default function MyQuizzes() {
   const { instance } = useAxios();
@@ -26,20 +26,6 @@ export default function MyQuizzes() {
     },
     staleTime: 1000 * 60 * 5, //set the query fresh for 5 minutes
   });
-
-
-
-  if (isLoading)
-    return (
-      <div className="card flex align-items-center justify-content-center">
-        <ProgressBar
-          mode="indeterminate"
-          style={{ height: "6px" }}
-        ></ProgressBar>
-      </div>
-    );
-
-  if (isError) return <h1>error</h1>; //<Error error={error} />    }
 
   if (isLoading) return <Loader />;
   if (isError) return <Error error={error as Error} />;

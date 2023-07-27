@@ -42,8 +42,7 @@ router.post("/quiz/:id", getMulter("images/quiz").single("image"), async (req, r
   });
 
   res.send({ ok: true });
-}
-);
+});
 
 
 export default router;
