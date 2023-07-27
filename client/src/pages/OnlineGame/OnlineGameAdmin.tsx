@@ -1,30 +1,35 @@
 import { useParams } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useAxios } from '../../hooks/useAxios';
 import { useQuery } from 'react-query';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
-import { PlayerType, QuestionType, QuizType, QuestionOptionType, AnswerResultType } from '../../types/dataObjects';
+import { PlayerType, QuestionType, QuizType, AnswerResultType, GameData } from '../../types/dataObjects';
 import { adimnSocket } from '../../common/sockets'
 import Error from "../../components/Error";
 import Loader from "../../components/Loader"
-import CurrentQuestionOnLiveGame from '../../components/CurrentQuestionOnLiveGame';
-import { Avatar } from 'primereact/avatar';
-import { Badge } from 'primereact/badge';
 import { Button } from 'primereact/button';
 import { Tooltip } from 'primereact/tooltip';
+import QRCode from 'react-qr-code';
+import { Toast } from 'primereact/toast';
+import Players from './Players';
+import LiveGame from '../../components/LiveGame';
+import { DataTable } from 'primereact/datatable';
+import { useSession } from '../../hooks/useSession';
+import { Column } from 'primereact/column';
 
 
 export default function OnlineGameAdmin() {
     const { id } = useParams<{ id: string }>();
     const { instance } = useAxios();
+    const toast = useRef<Toast>(null);
 
     const [players, setPlayers] = useState<PlayerType[]>();
     const [gameToken, setGameToken] = useLocalStorage('gameToken', '');
     const [timeLeft, setTimeLeft] = useState<number>(0);
     const [gameStarted, setGameStarted] = useState<boolean>(false);
-
-
     const [currentQuestion, setCurrentQuestion] = useState<QuestionType | null>(null);
+    const [answerResults, setAnswerResults] = useState<AnswerResultType[]>([]);
+    const [gameData, setGameData] = useSession<GameData>('gameData', null as unknown as GameData);
 
     const { data, isLoading, isError, error } = useQuery({
         queryKey: ['online-game'],
@@ -35,10 +40,23 @@ export default function OnlineGameAdmin() {
             }
     });
 
+    let plyersScore: { playerName: string, score: number }[] = [];
+    useEffect(() => {
+        if (!players || !answerResults) return;
+        plyersScore = players.map(player => {
+            const score = answerResults.filter(result => result.playerId === player.id)
+                .reduce((prev, curr) => prev + curr.score, 0);
+            return { playerName: player.name, score };
+        });
+    }, [players, answerResults]);
+
+
+
     const onConnect = () => {
-        if (!data) return;
+        if (!id) return;
+        const quizId = parseInt(id);
         console.log('connected');
-        adimnSocket.emit('openGame', data.id);
+        adimnSocket.emit('openGame', quizId);
     }
 
     const onGetGameToken = (token: string) => {
@@ -63,8 +81,22 @@ export default function OnlineGameAdmin() {
         setCurrentQuestion(question);
     }
 
-    const onTotalAnswerResult = (result: AnswerResultType[]) => {
+    const onTotalAnswerResult = (result: AnswerResultType) => {
         console.log(result);
+        setAnswerResults(prev => [...prev, result]);
+    }
+
+    const onGameError = (error: string) => {
+        toast.current?.show({
+            severity: 'error',
+            summary: 'Error',
+            detail: error,
+            life: 3000
+        });
+    }
+
+    const onGemaData = (data: GameData) => {
+        setGameData(data);
     }
 
     useEffect(() => {
@@ -74,7 +106,9 @@ export default function OnlineGameAdmin() {
         adimnSocket.on('newPlayer', onNewPlayer);
         adimnSocket.on('timeLeft', onLeftTime);
         adimnSocket.on('currentQuestion', onCurrentQuestion);
-        adimnSocket.on('totalAnswerResult', onTotalAnswerResult);
+        adimnSocket.on('answerResult', onTotalAnswerResult);
+        adimnSocket.on('gameError', onGameError);
+        adimnSocket.on('gameData', onGemaData);
 
         return () => {
             adimnSocket.off('connect', onConnect);
@@ -82,10 +116,12 @@ export default function OnlineGameAdmin() {
             adimnSocket.off('newPlayer', onNewPlayer);
             adimnSocket.off('timeLeft', onLeftTime);
             adimnSocket.off('currentQuestion', onCurrentQuestion);
-            adimnSocket.off('totalAnswerResult', onTotalAnswerResult);
+            adimnSocket.off('answerResult', onTotalAnswerResult);
+            adimnSocket.off('gameError', onGameError);
+            adimnSocket.off('gameData', onGemaData);
             adimnSocket.disconnect();
         }
-    }, [data]);
+    }, []);
 
 
     if (isLoading) return <Loader />
@@ -94,58 +130,46 @@ export default function OnlineGameAdmin() {
 
     const quiz = data;
 
-    const onSelectedOption = (option: QuestionOptionType) => {
-        console.log(option);
-    };
-
-    const getRandomColor = () => {
-        return {
-            backgroundColor: '#' + Math.floor(Math.random() * 16777215).toString(16),
-            color: '#' + Math.floor(Math.random() * 16777215).toString(16)
-        }
-    }
+    console.log(`http://localhost:5173/live/game/${gameToken}`);
 
     return (
-        <div className='flex flex-column justify-content-center align-items-center'>
-            <h1>{quiz.name}</h1>
-
-            {!gameStarted && <h2>Game Link: {`http://localhost:5173/live/game/${gameToken}`}</h2>}
+        <div className='flex h-full flex-column justify-content-start align-items-center bg-purple-800'>
+            {!gameStarted &&
+                <div className='m-3 flex flex-column justify-content-center align-items-center'>
+                    <div className='text-6xl text-blue-100 font-bold mb-3'>Scaen To Join To The
+                        {<span className='text-purple-100 text-6xl font-bold mb-3'> {quiz.name}</span>} Quiz:</div>
+                    <Tooltip target=".qrcode" mouseTrack mouseTrackLeft={10} />
+                    <QRCode
+                        data-pr-tooltip={`http://localhost:5173/live/game/${gameToken}`}
+                        className='qrcode surface-200 shadow-8 m-4'
+                        value={`http://localhost:5173/live/game/${gameToken}`} />
+                </div>
+            }
 
             {!gameStarted && <Button
                 label="Start Game"
-                className="p-button-success w-2"
+                icon="pi pi-play"
+                className=""
                 onClick={() => adimnSocket.emit('startGame', gameToken)}
             />}
 
             <div className='w-6'>
                 {currentQuestion &&
-                    <CurrentQuestionOnLiveGame
+                    <LiveGame
+                        gameData={gameData}
                         question={currentQuestion}
-                        onSelectedOption={onSelectedOption}
                         time={timeLeft} />
                 }
             </div>
 
-            <div className='absolute bottom-0 mb-3 flex-row flex justify-content-center align-items-center gap-5'>
-                {players &&
-                    players.map(player => {
-                        return (
-                            <div key={player.id} className='flex-auto card'>
-                                <Tooltip target=".avtar" mouseTrack mouseTrackLeft={10} />
+            {plyersScore.length > 0 && <DataTable value={plyersScore}>
+                <Column field="playerName" header="Player Name"></Column>
+                <Column field="score" header="Score"></Column>
+            </DataTable>}
 
-                                <Avatar
-                                    data-pr-tooltip={player.name}
-                                    label={player.name.charAt(0).toUpperCase()}
-                                    size="large"
-                                    className="p-overlay-badge avtar"
-                                    style={getRandomColor()}>
-                                    {player.score !== 0 && <Badge value={player.score} />}
-                                </Avatar>
-                            </div>
-                        )
-                    })
-                }
-            </div>
+
+            {players && <Players players={players} />}
+            <Toast ref={toast} />
         </div>
     )
 }

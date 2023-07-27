@@ -7,14 +7,23 @@ import {
 } from './events';
 
 export type AnswerResult = {
-    playerId: number | string;
+    playerId: number;
     questionId: number;
+    option: QuestionOptionType;
     isRight: boolean;
     score: number;
 }
 
+export type GameData = {
+    name: string;
+    id: number;
+    description: string;
+    questionsCount: number;
+    totalTime: number;
+}
+
 export type Player = {
-    id: number | string;
+    id: number;
     name: string;
     score: number;
     gameId: number;

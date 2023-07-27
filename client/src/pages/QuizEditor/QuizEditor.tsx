@@ -272,10 +272,11 @@ function QuizEditor() {
   }
 
   return (
-    <>
+    <div className="flex flex-column justify-content-center align-items-center">
       <Toast ref={toast} />
-      <h1>{quizQuery.data?.name}</h1>
-      <div className="flex flex-column gap-2">
+      <div className='text-4xl text-purple-200 font-bold mb-3'>Edit
+        {<span className="text-white font-italic"> {quizQuery.data?.name} </span>} Quiz</div>
+      <div className="gap-3 w-10">
         {questionsDOM}
         <Button
           icon="pi pi-save"
@@ -293,7 +294,7 @@ function QuizEditor() {
         onClick={addQuestion}
         disabled={saveQuizMutation.isLoading}
       />
-    </>
+    </div>
   );
 }
 

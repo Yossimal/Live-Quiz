@@ -62,6 +62,14 @@ export type QuizType = {
   };
 };
 
+export type GameData = {
+  id: number;
+  name: string;
+  description: string;
+  questionsCount: number;
+  totalTime: number;
+}
+
 export type OnlineGameType = {
   id: number;
   gameId: number;
@@ -88,6 +96,7 @@ export type TimeStampType = {
 export type AnswerResultType = {
   playerId: number | string;
   questionId: number;
+  option: QuestionOptionType;
   isRight: boolean;
   score: number;
 }

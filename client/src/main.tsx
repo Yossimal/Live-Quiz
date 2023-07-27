@@ -4,7 +4,7 @@ import './index.css'
 import React from 'react';
 
 //theme
-import "primereact/resources/themes/tailwind-light/theme.css";
+import "primereact/resources/themes/mdc-dark-deeppurple/theme.css";
 //core
 import "primereact/resources/primereact.min.css";
 

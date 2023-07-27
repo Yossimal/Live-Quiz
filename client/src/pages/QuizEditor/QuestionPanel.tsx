@@ -6,6 +6,7 @@ import { InputNumber } from "primereact/inputnumber";
 import NumberInput from "./NumberInput";
 import QuestionOptionList from "./QuestionOptionList";
 import { QuestionOptionType } from "../../types/dataObjects";
+import { Divider } from "primereact/divider";
 
 type QuestionPanelProps = {
   questionState: PartialState<EdibleQuestionType>;
@@ -130,37 +131,49 @@ export default function QuestionPanel({
   );
 
   return (
-    <Panel headerTemplate={headerTemplate} toggleable>
+    <Panel className="surface mb-2 shadow-3 border-round" headerTemplate={headerTemplate} toggleable>
       <div className="flex flex-column gap-2">
-        <div className="flex flex-column gap-2">
-          <label htmlFor="question">Question:</label>
-          <InputText
-            id="question"
-            value={question.question}
-            onChange={(e) =>
-              setQuestion({
-                ...question,
-                question: e.currentTarget.value,
-                isChanged: true,
-              })
-            }
-          />
-          <NumberInput
-            id="score"
-            labelText="Score:"
-            value={question.score ?? 10}
-            onChange={(score) =>
-              setQuestion({ ...question, score, isChanged: true })
-            }
-          />
-          <NumberInput
-            id="time"
-            labelText="Time:"
-            value={question.time ?? 100}
-            onChange={(time) =>
-              setQuestion({ ...question, time, isChanged: true })
-            }
-          />
+        <div className="flex flex-column gap-2 align-items-center justify-content-center ">
+          <div className="flex align-items-center w-full justify-content-start gap-3 align-self-start">
+            <label htmlFor="question">Question:</label>
+            <InputText
+              id="question"
+              className='w-full'
+              value={question.question}
+              onChange={(e) =>
+                setQuestion({
+                  ...question,
+                  question: e.currentTarget.value,
+                  isChanged: true,
+                })
+              }
+            />
+          </div>
+          <div className="flex w-9 lg:w-full flex-column lg:flex-row lg:justify-content-between">
+            <NumberInput
+              id="score"
+              labelText="Score: 🏆"
+              value={question.score ?? 10}
+              onChange={(score) =>
+                setQuestion({ ...question, score, isChanged: true })
+              }
+            />
+            <Divider layout="vertical" className="hidden lg:block" />
+            <NumberInput
+              id="time"
+              labelText="Time: ⏳ (seconds)"
+              value={question.time ?? 100}
+              onChange={(time) =>
+                setQuestion({ ...question, time, isChanged: true })
+              }
+            />
+          </div>
+          <Divider align="center">
+            <div className="inline-flex align-items-center">
+              <i className="pi pi-list mr-2"></i>
+              <b>Options</b>
+            </div>
+          </Divider>
           <QuestionOptionList
             optionsState={[question.options ?? [], setOptions]}
           />

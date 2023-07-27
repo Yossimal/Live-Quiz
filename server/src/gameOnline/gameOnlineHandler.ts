@@ -29,10 +29,9 @@ export default function gameOnlinHandler(socket: MySocket) {
         };
         const game = new Game(quizInGame, creator);
         games.push(game);
-        socket.emit('getGameToken', game.gameToken);
     });
 
-    socket.on('startGame', async token => {
+    socket.on('startGame', token => {
         const game = games.find(g => g.gameToken === token);
         if (!game) {
             socket.emit('gameError', 'game not found');
@@ -42,7 +41,23 @@ export default function gameOnlinHandler(socket: MySocket) {
             socket.emit('gameError', 'no players');
             return;
         }
+        console.log('startGame', game.quiz.name);
         game.startGame();
+    });
+
+    socket.on('getGameData', token => {
+        const game = games.find(g => g.gameToken === token);
+        if (!game) {
+            socket.emit('gameError', 'game not found');
+            return;
+        }
+        socket.emit('gameData', {
+            name: game.quiz.name,
+            id: game.quiz.id,
+            description: game.quiz.description,
+            questionsCount: game.quiz.questions.length,
+            totalTime: game.quiz.questions.reduce((acc, q) => acc + q.time, 0)
+        });
     });
 
     socket.on('joinGame', (token, name) => {
@@ -54,7 +69,7 @@ export default function gameOnlinHandler(socket: MySocket) {
         }
         const player: PlayerInGame = {
             name,
-            id: socket.id,
+            id: 0,
             score: 0,
             gameId: game.quiz.id,
             gameName: game.quiz.name,
@@ -63,13 +78,13 @@ export default function gameOnlinHandler(socket: MySocket) {
         game.addPlayer(player);
     });
 
-    socket.on('submitAnswer', (token, optionId) => {
+    socket.on('submitAnswer', (token, playerId, optionId) => {
         const game = games.find(g => g.gameToken === token);
         if (!game) {
             socket.emit('gameError', 'game not found');
             return;
         }
-        const player = game.players.find(p => p.id === socket.id);
+        const player = game.players.find(p => p.id === playerId);
         if (!player) {
             socket.emit('gameError', 'player not found');
             return;
