@@ -6,6 +6,7 @@ import Error from "../../components/Error";
 import Loader from "../../components/Loader";
 import QuizItem from "./QuizItem";
 import { ProgressBar } from "primereact/progressbar";
+import { SERVER_URL } from "../../common/consts";
 
 export default function MyQuizzes() {
   const { instance } = useAxios();
@@ -14,12 +15,18 @@ export default function MyQuizzes() {
     queryKey: ["my-quizzes"],
     queryFn: async () => {
       const { data } = await instance!.get<QuizType[]>("/quiz");
-      return data;
+      const results = data.map((quiz) => {
+        return {
+          ...quiz,
+          image: quiz.imageId
+            ? `${SERVER_URL}/media/${quiz.imageId}`
+            : undefined,
+        };
+      });
+      return results;
     },
     staleTime: 1000 * 60 * 5, //set the query fresh for 5 minutes
   });
-
-
 
   if (isLoading)
     return (
@@ -44,7 +51,7 @@ export default function MyQuizzes() {
         <DataView
           value={data}
           itemTemplate={(quiz: QuizType) => {
-            return <QuizItem quiz={quiz}  />;
+            return <QuizItem quiz={quiz} />;
           }}
         />
       </div>

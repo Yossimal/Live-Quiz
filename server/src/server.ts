@@ -16,6 +16,7 @@ import {
   AdminClientToServerEvents,
   UserClientToServerEvents,
 } from './gameOnline/events';
+import mediaGetRoute from "./routes/mediaGet/routh";
 import { SocketData } from './gameOnline/types'
 import gameOnlinHandler from './gameOnline/gameOnlineHandler'
 
@@ -45,6 +46,7 @@ export const io = new Server<
 app.use("/auth", authRoute);
 app.use("/api/quiz", authenticate, quizRoute);
 app.use("/api/media", authenticate, mediaRoute);
+app.use("/media",mediaGetRoute)
 
 io.on('connection', gameOnlinHandler);
 
