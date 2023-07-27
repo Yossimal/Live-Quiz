@@ -2,10 +2,8 @@ import { Panel, PanelHeaderTemplateOptions } from "primereact/panel";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { Toolbar } from "primereact/toolbar";
-import { InputNumber } from "primereact/inputnumber";
 import NumberInput from "./NumberInput";
 import QuestionOptionList from "./QuestionOptionList";
-import { QuestionOptionType } from "../../types/dataObjects";
 import { Divider } from "primereact/divider";
 
 type QuestionPanelProps = {

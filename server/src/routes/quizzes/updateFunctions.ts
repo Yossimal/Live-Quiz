@@ -40,7 +40,7 @@ export function getOptionsToAdd(
   console.log("getOptionsToAdd", questions);
   return (
     questions
-      .map((q) => q.options?.map((o) => ({ ...o, quesitionId: q.id })))
+      .map((q) => q.options?.map((o:UpdateQuizQuestionOptionType) => ({ ...o, quesitionId: q.id })))
       .flat()
       .filter((o): o is OptionToAdd => {
         console.log(
@@ -155,7 +155,7 @@ export function getAddQuestionPromise(
       })
       .then(async (id) => {
         const options =
-          q.options?.map((o) => ({
+          q.options?.map((o:UpdateQuizQuestionOptionType) => ({
             isCorrect: o.isCorrect!,
             data: o.data!,
             questionId: id.id,

@@ -7,7 +7,16 @@ import {
   updateQuizValidation,
   UpdateQuizType,
 } from "./validation";
-import { addOptions, addQuestions, deleteQuestions, getOptionsToAdd, splitQuestionsToUpdatAddAndDelete, updateBaseQuiz, updateOptions, updateQuestions } from "./updateFunctions";
+import {
+  addOptions,
+  addQuestions,
+  deleteQuestions,
+  getOptionsToAdd,
+  splitQuestionsToUpdatAddAndDelete,
+  updateBaseQuiz,
+  updateOptions,
+  updateQuestions,
+} from "./updateFunctions";
 import { PrismaClientValidationError } from "@prisma/client/runtime/library";
 
 const prisma = new PrismaClient();
@@ -29,7 +38,7 @@ router.get("/", skipTakeValidation, async (req, res) => {
     include: {
       _count: {
         select: {
-          questions: {where: {isDeleted: false}},
+          questions: { where: { isDeleted: false } },
           onlineQuizzes: true,
         },
       },
@@ -69,7 +78,11 @@ router.get("/:id", async (req, res) => {
           isDeleted: false,
         },
         include: {
-          options: true,
+          options: {
+            where: {
+              isDeleted: false,
+            },
+          },
         },
       },
     },
@@ -124,7 +137,10 @@ router.post("/update", updateQuizValidation, async (req, res) => {
   const quiz = res.locals.updatedQuiz as UpdateQuizType;
   const [questionsToUpdate, questionsToAdd, questionsToDelete] =
     splitQuestionsToUpdatAddAndDelete(quiz.questions ?? []);
-  const optionsToAdd = getOptionsToAdd([...questionsToAdd,...questionsToUpdate]);
+  const optionsToAdd = getOptionsToAdd([
+    ...questionsToAdd,
+    ...questionsToUpdate,
+  ]);
   try {
     await Promise.all([
       updateBaseQuiz(quiz),
