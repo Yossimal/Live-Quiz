@@ -19,15 +19,19 @@ export default function QuestionOnLiveGame({ question, onSelectedOption, time }:
         onSelectedOption(selectedOption);
     }, [selectedOption]);
 
+    useEffect(() => {
+        setIsSelected(false);
+    }, [question]);
+
     if (!question) return <></>;
 
     const timeTemplate = (value: number) => {
         return (
-            <div className='h-2rem'>
+            <>
                 {value / 10}/<b>{question.time}</b>
-            </div>
+            </>
         );
-    };
+    }
 
     const calcProgress = () => {
         return (time / question.time) * 100;
@@ -39,7 +43,7 @@ export default function QuestionOnLiveGame({ question, onSelectedOption, time }:
     }
 
     return (
-        <div className='my-3 surface-50 p-5'>
+        <div className='my-2 surface-50 p-5'>
             <h1>{question.question}</h1>
             <div className='w-full flex flex-column justify-content-center align-items-center gap-3 mb-3'>
                 {question.options?.map(opt => {
@@ -57,8 +61,11 @@ export default function QuestionOnLiveGame({ question, onSelectedOption, time }:
                     )
                 })}
             </div>
-            <div className="h-2rem">
-                <ProgressBar value={calcProgress()} displayValueTemplate={timeTemplate} />
+            <div className='card'>
+                <ProgressBar
+                    className='h-1rem'
+                    value={calcProgress()}
+                    displayValueTemplate={timeTemplate} ></ProgressBar>
             </div>
         </div>
     )

@@ -1,4 +1,4 @@
-import { scryptSync } from 'crypto';
+import { scryptSync, randomUUID } from 'crypto';
 import { PlayerInGame, QuizType, GameCreator, AnswerResult } from './types';
 import { io } from '../server'
 
@@ -27,7 +27,8 @@ export default class Game {
         player.socket.join(this.gameToken);
         this.players.push(player);
         const { name, score, gameName, gameId } = player;
-        const playerDto = { id: this.players.length - 1, name, score, gameName, gameId };
+        const playerUUID = randomUUID();
+        const playerDto = { id: playerUUID, name, score, gameName, gameId };
         this.creator.socket.emit('newPlayer', playerDto);
         player.socket.emit('playerJoined', playerDto);
     }

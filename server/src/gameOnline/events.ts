@@ -34,5 +34,5 @@ export type AdminClientToServerEvents = {
 
 export type UserClientToServerEvents = {
     joinGame: (token: string, name: string) => void;
-    submitAnswer: (token: string, playerId: number, optionId: number) => void;
+    submitAnswer: (token: string, playerId: string, optionId: number) => void;
 } & ClientToServerEvents;

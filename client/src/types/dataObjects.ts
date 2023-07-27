@@ -80,7 +80,7 @@ export type OnlineGameType = {
 };
 
 export type PlayerType = {
-  id: number;
+  id: string;
   score: number;
   gameId: number;
   game?: QuizType;
@@ -96,7 +96,7 @@ export type TimeStampType = {
 
 
 export type AnswerResultType = {
-  playerId: number | string;
+  playerId: string;
   questionId: number;
   option: QuestionOptionType;
   isRight: boolean;

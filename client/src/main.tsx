@@ -3,13 +3,7 @@ import App from './App.tsx'
 import './index.css'
 import React from 'react';
 
-//theme
-import "primereact/resources/themes/mdc-dark-deeppurple/theme.css";
-//core
-import "primereact/resources/primereact.min.css";
 
-import "primeicons/primeicons.css";                 //icons
-import "primeflex/primeflex.css";                   //grid
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

@@ -1,6 +1,6 @@
 import { userSocket } from "../../../common/sockets";
 import { useState, useEffect, useRef } from "react";
-import { useParams, useLocation } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { QuestionType, QuestionOptionType, PlayerType, AnswerResultType, GameData } from "../../../types/dataObjects";
 import { Toast } from "primereact/toast";
 import { Badge } from "primereact/badge";
@@ -13,14 +13,19 @@ export default function PlayGame() {
     const [score, setScore] = useState<number>(0);
     const { gameToken, playerName } = useParams<{ gameToken: string, playerName: string }>();
     const [player, setPlayer] = useSession<PlayerType | null>('player', null);
-    const { state } = useLocation();
-    const gameData = state as GameData;
-    console.log(gameData);
+    const [gameData, setGameData] = useSession<GameData>('gameData', null as unknown as GameData);
+
+
     const toast = useRef<Toast>(null);
 
     const onConnect = () => {
         if (!gameToken || !playerName) throw 'gameToken or name is null';
+        if (player) {
+            console.log(`player ${JSON.stringify(player)}`)
+            return;
+        }
         userSocket.emit('joinGame', gameToken, playerName);
+        userSocket.emit('getGameData', gameToken);
     }
 
     const onCurrentQuestion = (question: QuestionType) => {
@@ -46,6 +51,10 @@ export default function PlayGame() {
         setPlayer(player);
     }
 
+    const onGemaData = (data: GameData) => {
+        setGameData(data);
+    }
+
     useEffect(() => {
         userSocket.connect();
         userSocket.on('connect', onConnect);
@@ -53,6 +62,7 @@ export default function PlayGame() {
         userSocket.on('timeLeft', onTimeLeft);
         userSocket.on('answerResult', onAnswerResult);
         userSocket.on('playerJoined', onPlayerJoined);
+        userSocket.on('gameData', onGemaData);
 
         return () => {
             userSocket.off('connect', onConnect);
@@ -60,17 +70,18 @@ export default function PlayGame() {
             userSocket.off('timeLeft', onTimeLeft);
             userSocket.off('answerResult', onAnswerResult);
             userSocket.off('playerJoined', onPlayerJoined);
+            userSocket.off('gameData', onGemaData);
             userSocket.disconnect();
         }
     }, []);
 
     const onSelectedOption = (option: QuestionOptionType) => {
         if (!gameToken) throw 'gameToken is null';
-        userSocket.emit('submitAnswer', gameToken, option.id);
+        userSocket.emit('submitAnswer', gameToken, player?.id!, option.id);
     }
 
     return (
-        <div className="flex flex-column align-items-center justify-content-center">
+        <div className="flex flex-column align-items-center">
             {!currentQuestion && <h1 className="text-center">Welcome {player?.name}</h1>}
             {currentQuestion ?
                 <LiveGame
@@ -80,7 +91,8 @@ export default function PlayGame() {
                     onSelectedOption={onSelectedOption} />
                 : <h1>Waiting for question</h1>
             }
-            <Badge className="w-min" value={score} size="xlarge" severity="success"></Badge>
+            {currentQuestion &&
+                <Badge className="w-min" value={score} size="xlarge" severity="success"></Badge>}
             <Toast ref={toast} />
         </div>
     )
