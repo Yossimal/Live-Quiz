@@ -30,7 +30,7 @@ export default function Router() {
       </Route>
       <Route path="/live/game/:gameToken">
         <Route index element={<JoinGame />} />
-        <Route path="play/:playerId" element={<PlayGame />} />
+        <Route path='play/:playerName' element={<PlayGame />} />
       </Route>
       <Route path="*" element={<h1>404</h1>} />
     </Routes>

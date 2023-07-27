@@ -47,7 +47,7 @@ export default function QuestionOptionList({
       <Button
         label="Add Option"
         icon="pi pi-plus"
-        className="p-button-secondary"
+        className="p-button-secondary align-self-start"
         onClick={() =>
           setOptions([
             ...options,

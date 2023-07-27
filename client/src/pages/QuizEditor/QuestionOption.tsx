@@ -15,7 +15,7 @@ export default function QuestionOption({
 
   return (
     <div className="p-inputgroup">
-      <span className="p-inputgroup-addon">
+      <span className="p-inputgroup-addon flex gap-2">
         <label htmlFor="isCorrect">Correct:</label>
         <Checkbox
           id="isCorrect"
@@ -43,6 +43,7 @@ export default function QuestionOption({
       <Button
         icon="pi pi-trash"
         className="p-button-danger"
+        tooltip="Delete this option"
         onClick={deleteOption}
       />
     </div>

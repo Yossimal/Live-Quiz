@@ -7,8 +7,9 @@
   -webkit-text-size-adjust: 100%;
   margin: 0;
   padding: 0;
-  background: #EFF3F8;
+  /* background: #EFF3F8; */
 }
+
 
 
 @media (min-width: 768px) {

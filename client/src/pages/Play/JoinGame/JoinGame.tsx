@@ -4,7 +4,9 @@ import { useParams, useNavigate } from "react-router-dom";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
-import { PlayerType } from "../../../types/dataObjects";
+import { GameData } from "../../../types/dataObjects";
+import { useSession } from "../../../hooks/useSession";
+import Loader from "../../../components/Loader";
 
 
 export default function JoinGame() {
@@ -13,10 +15,17 @@ export default function JoinGame() {
 
     const [name, setName] = useState<string>("");
     const { gameToken } = useParams<{ gameToken: string }>();
-    const gameName = useRef<string>("");
+    const [gameData, setGameData] = useSession<GameData | null>('game', null);
 
     const onConnect = () => {
+        if (!gameToken) return;
         console.log('connected');
+        userSocket.emit('getGameData', gameToken);
+    }
+
+    const onGetGameData = (game: GameData) => {
+        console.log(`game data: ${JSON.stringify(game)}`);
+        setGameData(game);
     }
 
     const onGameError = (error: string) => {
@@ -29,34 +38,25 @@ export default function JoinGame() {
         });
     }
 
-    const onPlayerJoined = (player: PlayerType) => {
-        if (!gameToken) return;
-        console.log(`player ${JSON.stringify(player)}`);
-        gameName.current = player.gameName;
-        navigate(`/live/game/${gameToken}/play/${player.id}`, {
-            state: {
-                player
-            }
-        });
-    }
-
     useEffect(() => {
         userSocket.connect();
         userSocket.on('connect', onConnect);
+        userSocket.on('gameData', onGetGameData);
         userSocket.on('gameError', onGameError);
-        userSocket.on('playerJoined', onPlayerJoined);
 
         return () => {
             userSocket.off('connect', onConnect);
-            userSocket.off('playerJoined', onPlayerJoined);
             userSocket.off('gameError', onGameError);
+            userSocket.off('gameData', onGetGameData);
             userSocket.disconnect();
         }
     }, []);
 
+    if (!gameData) return <Loader />;
+
     return (
         <div className="flex flex-column align-items-center justify-content-center gap-3">
-            <h1 className="text-3xl font-bold">Join To {gameName.current}</h1>
+            <h1 className="text-3xl font-bold">Join To {gameData.name}</h1>
             <InputText
                 className="w-1/2"
                 placeholder="Enter your name"
@@ -67,8 +67,13 @@ export default function JoinGame() {
                 className="w-1/2 mt-2"
                 label="Join"
                 disabled={!name || !gameToken}
-                onClick={() => userSocket.emit('joinGame', gameToken!, name)}
+                onClick={() => navigate(`/live/game/${gameToken}/play/${name}`, {
+                    state: {
+                        game: gameData
+                    }
+                })}
             />
+            <h5 className="mt-5">{gameData.description}</h5>
             <Toast ref={toast} />
         </div>
     )

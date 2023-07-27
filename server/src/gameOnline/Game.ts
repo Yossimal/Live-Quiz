@@ -7,14 +7,16 @@ export default class Game {
     players: PlayerInGame[];
     quiz: QuizType;
     gameToken: string;
-    currentQuestionIndex: number = 0;
+    private questionIndex: number = 0;
     creator: GameCreator;
     gameStarted: boolean = false;
+    private readonly timeBetweenQuestions: number = 10000;
     constructor(quiz: QuizType, creator: GameCreator) {
         this.players = [];
         this.quiz = quiz;
         this.gameToken = scryptSync(`${quiz.id}${Date.now()}`, 'salt', 16).toString('hex');
         creator.socket.join(this.gameToken);
+        creator.socket.emit('getGameToken', this.gameToken);
         this.creator = creator;
     }
 
@@ -22,44 +24,45 @@ export default class Game {
         if (this.gameStarted) {
             return;
         }
-        const { name, id, score, gameName, gameId } = player;
-        const playerDto = { name, id, score, gameName, gameId };
-        this.creator.socket.emit('newPlayer', playerDto);
         player.socket.join(this.gameToken);
         this.players.push(player);
+        const { name, score, gameName, gameId } = player;
+        const playerDto = { id: this.players.length - 1, name, score, gameName, gameId };
+        this.creator.socket.emit('newPlayer', playerDto);
         player.socket.emit('playerJoined', playerDto);
     }
 
     startGame() {
         this.gameStarted = true;
-        // this.creator.socket.emit('currentQuestion', this.quiz.questions[this.currentQuestionIndex])
-        // this.players.forEach(player => {
-        //     player.socket
-        //         .emit('currentQuestion', this.quiz.questions[this.currentQuestionIndex]);
-        // });
-
-        io.in(this.gameToken).to(this.gameToken).emit('currentQuestion', this.quiz.questions[this.currentQuestionIndex]);
+        this.nextQuestion();
     }
 
-    nextQuestion() {
-        this.currentQuestionIndex++;
-        if (this.currentQuestionIndex >= this.quiz.questions.length) {
+    private nextQuestion() {
+        if (this.questionIndex >= this.quiz.questions.length) {
             this.gameOver();
             return;
         }
-        // this.creator.socket.emit('currentQuestion', this.quiz.questions[this.currentQuestionIndex])
-        // this.players.forEach(player => {
-        //     player.socket.to(this.gameToken)
-        //         .emit('currentQuestion', this.quiz.questions[this.currentQuestionIndex]);
-        // });
-        io.to(this.gameToken).emit('currentQuestion', this.quiz.questions[this.currentQuestionIndex]);
+
+        const question = this.quiz.questions[this.questionIndex];
+        let time = question.time;
+
+        const sendTimeLeft = () => {
+            if (time >= 0) {
+                io.to(this.gameToken).emit('timeLeft', time);
+                time--;
+                setTimeout(sendTimeLeft, 1000);
+            } else {
+                this.questionIndex++;
+                setTimeout(() => this.nextQuestion(), this.timeBetweenQuestions);
+            }
+        };
+
+        io.to(this.gameToken).emit('currentQuestion', question);
+        sendTimeLeft();
     }
 
     gameOver() {
-        //this.creator.socket.emit('gameOver');
-        // this.players.forEach(player => {
-        //     player.socket.to(this.gameToken).emit('gameOver');
-        // });
+        console.log('gameOver');
         io.to(this.gameToken).emit('gameOver');
 
         this.creator.socket.disconnect();
@@ -69,7 +72,7 @@ export default class Game {
     }
 
     playerAnswered(player: PlayerInGame, optionId: number) {
-        const question = this.quiz.questions[this.currentQuestionIndex];
+        const question = this.quiz.questions[this.questionIndex];
         const answer = question.options.find(o => o.id === optionId);
         if (!answer) {
             return;
@@ -79,6 +82,7 @@ export default class Game {
             playerId: player.id,
             questionId: question.id,
             isRight: correct,
+            option: answer,
             score: correct ? question.time + 1 : 0
         };
         this.creator.socket.emit('answerResult', result);
