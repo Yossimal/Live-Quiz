@@ -8,6 +8,7 @@ import {
 } from './types';
 import { PrismaClient } from "@prisma/client";
 import Game from "./Game";
+import { randomUUID } from 'crypto';
 
 const prisma = new PrismaClient();
 
@@ -67,9 +68,10 @@ export default function gameOnlinHandler(socket: MySocket) {
             socket.emit('gameError', 'game not found');
             return;
         }
+        const playerUUID = randomUUID();
         const player: PlayerInGame = {
             name,
-            id: '',
+            id: playerUUID,
             score: 0,
             gameId: game.quiz.id,
             gameName: game.quiz.name,

@@ -48,9 +48,10 @@ export default function QuestionOnLiveGame({ question, onSelectedOption, time }:
             <div className='w-full flex flex-column justify-content-center align-items-center gap-3 mb-3'>
                 {question.options?.map(opt => {
                     return (
-                        <div key={opt.id} className='border-round-sm font-bold'>
+                        <div key={opt.id} className='border-round-sm font-bold w-full'>
                             <Button
                                 label={opt.data}
+                                className='w-full'
                                 disabled={isSelected || time <= 0}
                                 icon={getOptionIcon(opt)}
                                 onClick={() => {

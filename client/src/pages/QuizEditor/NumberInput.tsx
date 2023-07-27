@@ -14,7 +14,7 @@ export default function NumberInput({
   id,
 }: NumberInputProps) {
   return (
-    <div className="w-10">
+    <div className="">
       <label htmlFor={id}>{labelText}</label>
       <InputNumber
         id={id}

@@ -27,9 +27,8 @@ export default class Game {
         }
         player.socket.join(this.gameToken);
         this.players.push(player);
-        const { name, score, gameName, gameId } = player;
-        const playerUUID = randomUUID();
-        const playerDto = { id: playerUUID, name, score, gameName, gameId };
+        const { id, name, score, gameName, gameId } = player;
+        const playerDto = { id: id, name, score, gameName, gameId };
         this.creator.socket.emit('newPlayer', playerDto);
         player.socket.emit('playerJoined', playerDto);
     }
@@ -62,8 +61,11 @@ export default class Game {
                         player.socket.emit('answerResult', result);
                     }
                 });
-                this.creator.socket.emit('totalAnswersResults', this.answerResults
-                    .filter(r => r.questionId === question.id));
+                const total = this.answerResults
+                    .filter(r => r.questionId === question.id);
+                console.log('total', total);
+                console.log('creator soc', this.creator.socket.id)
+                this.creator.socket.emit('totalAnswersResults', total);
                 setTimeout(() => this.nextQuestion(), this.timeBetweenQuestions);
             }
         };

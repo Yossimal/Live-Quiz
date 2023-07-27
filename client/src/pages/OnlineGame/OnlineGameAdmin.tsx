@@ -24,13 +24,14 @@ export default function OnlineGameAdmin() {
     const { id } = useParams<{ id: string }>();
     const toast = useRef<Toast>(null);
 
-    const [players, setPlayers] = useState<PlayerType[]>();
+    const [players, setPlayers] = useState<PlayerType[]>([]);
     const [timeLeft, setTimeLeft] = useState<number>(0);
     const [gameStarted, setGameStarted] = useState<boolean>(false);
     const [currentQuestion, setCurrentQuestion] = useState<QuestionType | null>(
         null
     );
     const [answerResults, setAnswerResults] = useState<Map<number, AnswerResultType[]>>(new Map());
+    const [plyersScore, setPlyersScore] = useState<{ playerName: string; score: number }[]>([]);
 
     const [gameData, setGameData] = useSession<GameData | null>(
         "gameData",
@@ -38,20 +39,15 @@ export default function OnlineGameAdmin() {
     );
     const [gameToken, setGameToken] = useLocalStorage("gameToken", "");
 
-    let plyersScore: { playerName: string; score: number }[] = [];
     useEffect(() => {
-        if (!players || !answerResults || !currentQuestion) return;
-        plyersScore = players.map((player) => {
-            const playerResults = answerResults.get(currentQuestion!.id);
-            const score = playerResults?.reduce((acc, curr) => {
-                if (curr.playerId === player.id) {
-                    return acc + curr.score;
-                }
-                return acc;
-            }, 0);
-            return { playerName: player.name, score: score ?? 0 };
-        });
-    }, [players, answerResults]);
+        if (!players) return;
+
+        const plyersScoreTemp: { playerName: string; score: number }[]
+            = players.map((player) => {
+                return { playerName: player.name, score: player.score };
+            });
+        setPlyersScore(plyersScoreTemp);
+    }, [players]);
 
     const onConnect = () => {
         if (!id) return;
@@ -67,6 +63,7 @@ export default function OnlineGameAdmin() {
     };
 
     const onNewPlayer = (player: PlayerType) => {
+        if (!player) return;
         setPlayers((prev) => {
             if (!prev) return [player];
             return [...prev, player];
@@ -76,20 +73,29 @@ export default function OnlineGameAdmin() {
     const onLeftTime = (time: number) => {
         setTimeLeft(time);
     };
+
     const onCurrentQuestion = (question: QuestionType) => {
         if (!gameStarted) {
             setGameStarted(true);
         }
+        if (!question) return;
         setCurrentQuestion(question);
     };
 
     const onTotalAnswerResult = (result: AnswerResultType[]) => {
-        console.log(result);
+        console.log("result", result);
+        if (!result?.length) return;
         setAnswerResults((prev) => {
             const newMap = new Map(prev);
-            newMap.set(currentQuestion!.id, result);
+            newMap.set(result[0].questionId, result);
             return newMap;
         });
+        setPlayers(prev => prev.map((player) => {
+            const playerResult = result.find((r) => r.playerId === player.id);
+            console.log("playerResult", playerResult, 'player', player);
+            if (!playerResult) return player;
+            return { ...player, score: playerResult.score + player.score };
+        }));
     };
 
     const onGameError = (error: string) => {
@@ -106,25 +112,55 @@ export default function OnlineGameAdmin() {
     };
 
     useEffect(() => {
+        adimnSocket.on("currentQuestion", onCurrentQuestion);
+        return () => {
+            adimnSocket.off("currentQuestion", onCurrentQuestion);
+        };
+    }, [currentQuestion]);
+
+    useEffect(() => {
+        adimnSocket.on("totalAnswersResults", onTotalAnswerResult);
+        return () => {
+            adimnSocket.off("totalAnswersResults", onTotalAnswerResult);
+        };
+    }, [answerResults, players]);
+
+    useEffect(() => {
+        adimnSocket.on("gameData", onGemaData);
+        return () => {
+            adimnSocket.off("gameData", onGemaData);
+        };
+    }, [gameData]);
+
+    useEffect(() => {
+        adimnSocket.on("timeLeft", onLeftTime);
+        return () => {
+            adimnSocket.off("timeLeft", onLeftTime);
+        };
+    }, [timeLeft]);
+
+    useEffect(() => {
+        adimnSocket.on("getGameToken", onGetGameToken);
+        return () => {
+            adimnSocket.off("getGameToken", onGetGameToken);
+        };
+    }, [gameToken]);
+
+    useEffect(() => {
+        adimnSocket.on("newPlayer", onNewPlayer);
+        return () => {
+            adimnSocket.off("newPlayer", onNewPlayer);
+        };
+    }, [players]);
+
+    useEffect(() => {
         adimnSocket.connect();
         adimnSocket.on("connect", onConnect);
-        adimnSocket.on("getGameToken", onGetGameToken);
-        adimnSocket.on("newPlayer", onNewPlayer);
-        adimnSocket.on("timeLeft", onLeftTime);
-        adimnSocket.on("currentQuestion", onCurrentQuestion);
-        adimnSocket.on("totalAnswersResults", onTotalAnswerResult);
         adimnSocket.on("gameError", onGameError);
-        adimnSocket.on("gameData", onGemaData);
 
         return () => {
             adimnSocket.off("connect", onConnect);
-            adimnSocket.off("getGameToken", onGetGameToken);
-            adimnSocket.off("newPlayer", onNewPlayer);
-            adimnSocket.off("timeLeft", onLeftTime);
-            adimnSocket.off("currentQuestion", onCurrentQuestion);
-            adimnSocket.off("totalAnswersResults", onTotalAnswerResult);
             adimnSocket.off("gameError", onGameError);
-            adimnSocket.off("gameData", onGemaData);
             adimnSocket.disconnect();
         };
     }, []);
@@ -133,29 +169,35 @@ export default function OnlineGameAdmin() {
     if (!gameData) return <ProgressSpinner className='m-5' />
 
     return (
-        <div className='flex h-full flex-column justify-content-start align-items-center bg-purple-800'>
-            {!gameStarted &&
-                <div className='m-3 flex flex-column justify-content-center align-items-center'>
-                    <div className='text-6xl text-blue-100 font-bold mb-3'>Scaen To Join To The
-                        {<span className='text-purple-100 text-6xl font-bold mb-3'> {gameData.name}</span>} Quiz:</div>
-                    <Tooltip target=".qrcode" mouseTrack mouseTrackLeft={10} />
-                    <QRCode
-                        data-pr-tooltip={`${CLIENT_URL}/live/game/${gameToken}`}
-                        className='qrcode surface-200 shadow-8 m-4'
-                        value={`${CLIENT_URL}/live/game/${gameToken}`} />
-                </div>
-            }
+        <div className='flex  bg-purple-800'>
+            <div className="flex flex-column justify-content-center align-items-center">
+                {!gameStarted &&
+                    <div className='m-3 flex flex-column justify-content-center align-items-center'>
+                        <div className='text-6xl text-blue-100 font-bold mb-3'>Scaen To Join To The
+                            {<span className='text-purple-100 text-6xl font-bold mb-3'> {gameData.name}</span>} Quiz:</div>
+                        <Tooltip target=".qrcode" mouseTrack mouseTrackLeft={10} />
+                        <QRCode
+                            data-pr-tooltip={`${CLIENT_URL}/live/game/${gameToken}`}
+                            className='qrcode surface-200 shadow-8 m-4'
+                            value={`${CLIENT_URL}/live/game/${gameToken}`} />
+                    </div>
+                }
 
-            {!gameStarted && (
-                <Button
-                    label="Start Game"
-                    icon="pi pi-play"
-                    className=""
-                    onClick={() => adimnSocket.emit("startGame", gameToken)}
-                />
-            )}
+                {!gameStarted && (
+                    <Button
+                        label="Start Game"
+                        icon="pi pi-play"
+                        className=""
+                        onClick={() => adimnSocket.emit("startGame", gameToken)}
+                    />
+                )}
 
-            <div className='w-6'>
+                {players && !gameStarted &&
+                    <Players players={players} />}
+                <Toast ref={toast} />
+            </div>
+
+            <div className='m-2 flex-auto'>
                 {currentQuestion &&
                     <LiveGame
                         gameData={gameData}
@@ -164,15 +206,16 @@ export default function OnlineGameAdmin() {
                 }
             </div>
 
-            {plyersScore.length > 0 && (
-                <DataTable value={plyersScore}>
-                    <Column field="playerName" header="Player Name"></Column>
-                    <Column field="score" header="Score"></Column>
-                </DataTable>
-            )}
+            <div className='m-2 flex-auto'>
+                {gameStarted && (
+                    <DataTable value={plyersScore}>
+                        <Column field="playerName" header="Player Name"></Column>
+                        <Column field="score" header="Score"></Column>
+                    </DataTable>
 
-            {players && <Players players={players} />}
-            <Toast ref={toast} />
+                )}
+            </div>
+
         </div>
     );
 }

@@ -1,4 +1,3 @@
-import { Tooltip } from "primereact/tooltip";
 import { PlayerType } from "../../types/dataObjects";
 import { Tag } from "primereact/tag";
 
@@ -12,14 +11,13 @@ export default function Players({ players }: { players: PlayerType[] }) {
     }
 
     return (
-        <div className='mt-5 flex-row flex justify-content-center align-items-center gap-5'>
+        <div className='my-5 flex-row overflow-auto flex justify-content-center align-items-center gap-5'>
             {players.map(player => {
                 return (
                     <div key={player.id} className='flex-auto card'>
-                        <Tooltip target=".avtar" mouseTrack mouseTrackLeft={10} />
                         <Tag
                             value={player.name}
-                            className="w-3rem"
+                            className="p-3 text-2xl font-bold"
                             style={getRandomColor()}>
                         </Tag>
                     </div>
