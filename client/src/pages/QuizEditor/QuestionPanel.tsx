@@ -118,18 +118,18 @@ export default function QuestionPanel({
     setQuestion({ ...question, options: newOptions, isChanged: true });
   };
 
-  const headerTemplate = (options: any) => (
-    <PanelHeaderTemplate
+  const headerTemplate = (options: any) => {
+    return <PanelHeaderTemplate
       questionText={question.question}
       onDelete={() => onDelete(question.id)}
       options={options}
       moveUp={() => moveUp(question.id)}
       moveDown={() => moveDown(question.id)}
     />
-  );
+};
 
   return (
-    <Panel className="surface mb-2 shadow-3 border-round" headerTemplate={headerTemplate} toggleable>
+    <Panel className="surface mb-2 shadow-3 border-round" headerTemplate={headerTemplate} collapsed toggleable>
       <div className="flex flex-column gap-2">
         <div className="flex flex-column gap-2 align-items-center justify-content-center ">
           <div className="flex align-items-center w-full justify-content-start gap-3 align-self-start">
