@@ -50,7 +50,8 @@ export type QuizType = {
   id: number;
   name: string;
   description: string;
-  image: string;
+  imageId?: number | null;
+  image?: string;
   questions?: QuestionType[];
   creatorId: number;
   //creator?: UserType;

@@ -28,12 +28,16 @@ router.post("/quiz/:id", getMulter("images/quiz").single("image"), async (req, r
   if (!media?.id) {
     return res.status(500).send({ error: "Something went wrong" });
   }
-  prisma.quiz.update({
+  const results = await prisma.quiz.update({
     where: {
       id: quizId,
     },
     data: {
       imageId: media.id,
+    },
+    select: {
+      imageId: true,
+      id: true,
     },
   });
 
@@ -41,25 +45,5 @@ router.post("/quiz/:id", getMulter("images/quiz").single("image"), async (req, r
 }
 );
 
-router.get("media/:id", async (req, res) => {
-  try {
-    const id = parseInt(req.params.id);
-
-    const media = await prisma.media.findFirst({
-      where: {
-        id,
-      },
-      select: {
-        path: true,
-      },
-    });
-
-    if (!media) return res.status(404).send({ error: "Media not found" });
-
-    res.sendFile(media.path);
-  } catch (error) {
-    res.status(500).send({ error: "Something went wrong" });
-  }
-});
 
 export default router;
