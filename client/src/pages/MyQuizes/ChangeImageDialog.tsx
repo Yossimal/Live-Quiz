@@ -103,8 +103,6 @@ export default function ChangeImageDialog({
         ref={fileUpload}
         customUpload
         accept="image/*"
-        url="http://localhost:3000/test"
-        // uploadHandler={}
         maxFileSize={10000000} // 10MB
         auto={false} // We'll handle the upload manually
         itemTemplate={bodyTemplate}

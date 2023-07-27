@@ -16,6 +16,7 @@ import LiveGame from '../../components/LiveGame';
 import { DataTable } from 'primereact/datatable';
 import { useSession } from '../../hooks/useSession';
 import { Column } from 'primereact/column';
+import { CLIENT_URL } from '../../common/consts';
 
 
 export default function OnlineGameAdmin() {
@@ -130,7 +131,7 @@ export default function OnlineGameAdmin() {
 
     const quiz = data;
 
-    console.log(`http://localhost:5173/live/game/${gameToken}`);
+    console.log(`${CLIENT_URL}/live/game/${gameToken}`);
 
     return (
         <div className='flex h-full flex-column justify-content-start align-items-center bg-purple-800'>
@@ -140,9 +141,9 @@ export default function OnlineGameAdmin() {
                         {<span className='text-purple-100 text-6xl font-bold mb-3'> {quiz.name}</span>} Quiz:</div>
                     <Tooltip target=".qrcode" mouseTrack mouseTrackLeft={10} />
                     <QRCode
-                        data-pr-tooltip={`http://localhost:5173/live/game/${gameToken}`}
+                        data-pr-tooltip={`${CLIENT_URL}/live/game/${gameToken}`}
                         className='qrcode surface-200 shadow-8 m-4'
-                        value={`http://localhost:5173/live/game/${gameToken}`} />
+                        value={`${CLIENT_URL}/live/game/${gameToken}`} />
                 </div>
             }
 

@@ -5,13 +5,14 @@ import {
     ServerToUserClientEvents,
     UserClientToServerEvents
 } from '../types/eventsTypes'
+import { SERVER_URL } from "./consts";
 
 export const adimnSocket: Socket<ServerToAdminClientEvents, AdminClientToServerEvents>
-    = io('http://localhost:3000', {
+    = io(SERVER_URL, {
         autoConnect: false
     });
 
 export const userSocket: Socket<ServerToUserClientEvents, UserClientToServerEvents>
-    = io('http://localhost:3000', {
+    = io(SERVER_URL, {
         autoConnect: false
     });
