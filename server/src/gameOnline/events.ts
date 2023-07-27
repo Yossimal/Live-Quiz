@@ -6,7 +6,6 @@ export type ServerToClientEvents = {
     timeLeft: (time: number) => void;
     currentQuestion: (question: QuestionType) => void;
     gameOver: () => void;
-    answerResult: (result: AnswerResult) => void;
     gameError: (error: string) => void;
     gameData: (data: GameData) => void;
 }
@@ -14,12 +13,13 @@ export type ServerToClientEvents = {
 export type ServerToAdminClientEvents = {
     getGameToken: (token: string) => void;
     newPlayer: (player: Player) => void;
-    gameError: (error: string) => void;
+    totalAnswersResults: (results: AnswerResult[]) => void;
 } & ServerToClientEvents;
 
 export type ServerToUserClientEvents = {
     playerJoined: (player: Player) => void;
     gameData: (data: GameData) => void;
+    answerResult: (result: AnswerResult) => void;
 } & ServerToClientEvents;
 
 export type ClientToServerEvents = {

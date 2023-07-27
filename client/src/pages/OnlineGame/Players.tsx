@@ -1,7 +1,6 @@
 import { Tooltip } from "primereact/tooltip";
 import { PlayerType } from "../../types/dataObjects";
-import { Avatar } from "primereact/avatar";
-import { Badge } from "primereact/badge";
+import { Tag } from "primereact/tag";
 
 export default function Players({ players }: { players: PlayerType[] }) {
 
@@ -18,14 +17,11 @@ export default function Players({ players }: { players: PlayerType[] }) {
                 return (
                     <div key={player.id} className='flex-auto card'>
                         <Tooltip target=".avtar" mouseTrack mouseTrackLeft={10} />
-                        <Avatar
-                            data-pr-tooltip={player.name}
-                            label={player.name.charAt(0).toUpperCase()}
-                            size="large"
-                            className="p-overlay-badge avtar"
+                        <Tag
+                            value={player.name}
+                            className="w-3rem"
                             style={getRandomColor()}>
-                            {player.score !== 0 && <Badge value={player.score} />}
-                        </Avatar>
+                        </Tag>
                     </div>
                 )
             })}

@@ -73,6 +73,7 @@ export type QuestionType = {
     time: number;
     mediaId: number | null;
     index: number;
+    score: number;
 };
 
 export type QuizType = {

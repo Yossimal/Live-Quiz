@@ -14,22 +14,23 @@ import ResetPasswordRequest from "../pages/ResetPasswordRequest/ResetPasswordReq
 import ResetPassword from "../pages/ResetPassword/ResetPassword";
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
+import 'primereact/resources/themes/tailwind-light/theme.css'
 
 export default function Router() {
   const { pathname } = useLocation();
   const [theme, setTheme] = useState("");
 
-  useEffect(() => {
-    if (pathname === "/" || pathname === "/login" || pathname === "/signup") {
-      import('primereact/resources/themes/tailwind-light/theme.css').then(() => {
-        setTheme("tailwind-light");
-      });
-    } else {
-      import('primereact/resources/themes/mdc-dark-deeppurple/theme.css').then(() => {
-        setTheme("mdc-dark-deeppurple");
-      });
-    }
-  }, [pathname]);
+  // useEffect(() => {
+  //   if (pathname === "/" || pathname === "/login" || pathname === "/signup") {
+  //     import('primereact/resources/themes/tailwind-light/theme.css').then(() => {
+  //       setTheme("tailwind-light");
+  //     });
+  //   } else {
+  //     import('primereact/resources/themes/mdc-dark-deeppurple/theme.css').then(() => {
+  //       setTheme("mdc-dark-deeppurple");
+  //     });
+  //   }
+  // }, [pathname]);
 
   return (
     <div className={theme}>

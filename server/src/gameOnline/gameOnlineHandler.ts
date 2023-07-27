@@ -12,7 +12,7 @@ import Game from "./Game";
 const prisma = new PrismaClient();
 
 
-const games: Game[] = [];
+const games: Map<string, Game> = new Map();
 
 export default function gameOnlinHandler(socket: MySocket) {
     console.log(`user connected: ${socket.id}`);
@@ -28,11 +28,11 @@ export default function gameOnlinHandler(socket: MySocket) {
             socket
         };
         const game = new Game(quizInGame, creator);
-        games.push(game);
+        games.set(game.gameToken, game);
     });
 
     socket.on('startGame', token => {
-        const game = games.find(g => g.gameToken === token);
+        const game = games.get(token);
         if (!game) {
             socket.emit('gameError', 'game not found');
             return;
@@ -46,7 +46,7 @@ export default function gameOnlinHandler(socket: MySocket) {
     });
 
     socket.on('getGameData', token => {
-        const game = games.find(g => g.gameToken === token);
+        const game = games.get(token);
         if (!game) {
             socket.emit('gameError', 'game not found');
             return;
@@ -62,7 +62,7 @@ export default function gameOnlinHandler(socket: MySocket) {
 
     socket.on('joinGame', (token, name) => {
         console.log('joinGame', token, name);
-        const game = games.find(g => g.gameToken === token);
+        const game = games.get(token);
         if (!game) {
             socket.emit('gameError', 'game not found');
             return;
@@ -79,7 +79,7 @@ export default function gameOnlinHandler(socket: MySocket) {
     });
 
     socket.on('submitAnswer', (token, playerId, optionId) => {
-        const game = games.find(g => g.gameToken === token);
+        const game = games.get(token);
         if (!game) {
             socket.emit('gameError', 'game not found');
             return;
@@ -107,6 +107,9 @@ async function getQuiz(quizId: number, socket: MySocket) {
                 include: {
                     options: true,
                     media: true
+                },
+                orderBy: {
+                    index: 'asc'
                 }
             }
         }

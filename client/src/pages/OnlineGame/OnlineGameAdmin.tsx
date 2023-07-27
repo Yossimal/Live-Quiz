@@ -2,10 +2,10 @@ import { useParams } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import {
-  PlayerType,
-  QuestionType,
-  AnswerResultType,
-  GameData,
+    PlayerType,
+    QuestionType,
+    AnswerResultType,
+    GameData,
 } from "../../types/dataObjects";
 import { adimnSocket } from "../../common/sockets";
 import { Button } from "primereact/button";
@@ -21,108 +21,116 @@ import { CLIENT_URL } from "../../common/consts";
 import { ProgressSpinner } from "primereact/progressspinner";
 
 export default function OnlineGameAdmin() {
-  const { id } = useParams<{ id: string }>();
-  const toast = useRef<Toast>(null);
+    const { id } = useParams<{ id: string }>();
+    const toast = useRef<Toast>(null);
 
-  const [players, setPlayers] = useState<PlayerType[]>();
-  const [timeLeft, setTimeLeft] = useState<number>(0);
-  const [gameStarted, setGameStarted] = useState<boolean>(false);
-  const [currentQuestion, setCurrentQuestion] = useState<QuestionType | null>(
-    null
-  );
-  const [answerResults, setAnswerResults] = useState<AnswerResultType[]>([]);
+    const [players, setPlayers] = useState<PlayerType[]>();
+    const [timeLeft, setTimeLeft] = useState<number>(0);
+    const [gameStarted, setGameStarted] = useState<boolean>(false);
+    const [currentQuestion, setCurrentQuestion] = useState<QuestionType | null>(
+        null
+    );
+    const [answerResults, setAnswerResults] = useState<Map<number, AnswerResultType[]>>(new Map());
 
-  const [gameData, setGameData] = useSession<GameData | null>(
-    "gameData",
-    null
-  );
-  const [gameToken, setGameToken] = useLocalStorage("gameToken", "");
+    const [gameData, setGameData] = useSession<GameData | null>(
+        "gameData",
+        null
+    );
+    const [gameToken, setGameToken] = useLocalStorage("gameToken", "");
 
-  let plyersScore: { playerName: string; score: number }[] = [];
-  useEffect(() => {
-    if (!players || !answerResults) return;
-    plyersScore = players.map((player) => {
-      const score = answerResults
-        .filter((result) => result.playerId === player.id)
-        .reduce((prev, curr) => prev + curr.score, 0);
-      return { playerName: player.name, score };
-    });
-  }, [players, answerResults]);
+    let plyersScore: { playerName: string; score: number }[] = [];
+    useEffect(() => {
+        if (!players || !answerResults || !currentQuestion) return;
+        plyersScore = players.map((player) => {
+            const playerResults = answerResults.get(currentQuestion!.id);
+            const score = playerResults?.reduce((acc, curr) => {
+                if (curr.playerId === player.id) {
+                    return acc + curr.score;
+                }
+                return acc;
+            }, 0);
+            return { playerName: player.name, score: score ?? 0 };
+        });
+    }, [players, answerResults]);
 
-  const onConnect = () => {
-    if (!id) return;
-    const quizId = parseInt(id);
-    console.log("connected");
-    adimnSocket.emit("openGame", quizId);
-  };
-
-  const onGetGameToken = (token: string) => {
-    console.log(`token: ${token}`);
-    setGameToken(token);
-    adimnSocket.emit("getGameData", token);
-  };
-
-  const onNewPlayer = (player: PlayerType) => {
-    setPlayers((prev) => {
-      if (!prev) return [player];
-      return [...prev, player];
-    });
-  };
-
-  const onLeftTime = (time: number) => {
-    setTimeLeft(time);
-  };
-  const onCurrentQuestion = (question: QuestionType) => {
-    if (!gameStarted) {
-      setGameStarted(true);
-    }
-    setCurrentQuestion(question);
-  };
-
-  const onTotalAnswerResult = (result: AnswerResultType) => {
-    console.log(result);
-    setAnswerResults((prev) => [...prev, result]);
-  };
-
-  const onGameError = (error: string) => {
-    toast.current?.show({
-      severity: "error",
-      summary: "Error",
-      detail: error,
-      life: 3000,
-    });
-  };
-
-  const onGemaData = (data: GameData) => {
-    setGameData(data);
-  };
-
-  useEffect(() => {
-    adimnSocket.connect();
-    adimnSocket.on("connect", onConnect);
-    adimnSocket.on("getGameToken", onGetGameToken);
-    adimnSocket.on("newPlayer", onNewPlayer);
-    adimnSocket.on("timeLeft", onLeftTime);
-    adimnSocket.on("currentQuestion", onCurrentQuestion);
-    adimnSocket.on("answerResult", onTotalAnswerResult);
-    adimnSocket.on("gameError", onGameError);
-    adimnSocket.on("gameData", onGemaData);
-
-    return () => {
-      adimnSocket.off("connect", onConnect);
-      adimnSocket.off("getGameToken", onGetGameToken);
-      adimnSocket.off("newPlayer", onNewPlayer);
-      adimnSocket.off("timeLeft", onLeftTime);
-      adimnSocket.off("currentQuestion", onCurrentQuestion);
-      adimnSocket.off("answerResult", onTotalAnswerResult);
-      adimnSocket.off("gameError", onGameError);
-      adimnSocket.off("gameData", onGemaData);
-      adimnSocket.disconnect();
+    const onConnect = () => {
+        if (!id) return;
+        const quizId = parseInt(id);
+        console.log("connected");
+        adimnSocket.emit("openGame", quizId);
     };
-  }, []);
+
+    const onGetGameToken = (token: string) => {
+        console.log(`token: ${token}`);
+        setGameToken(token);
+        adimnSocket.emit("getGameData", token);
+    };
+
+    const onNewPlayer = (player: PlayerType) => {
+        setPlayers((prev) => {
+            if (!prev) return [player];
+            return [...prev, player];
+        });
+    };
+
+    const onLeftTime = (time: number) => {
+        setTimeLeft(time);
+    };
+    const onCurrentQuestion = (question: QuestionType) => {
+        if (!gameStarted) {
+            setGameStarted(true);
+        }
+        setCurrentQuestion(question);
+    };
+
+    const onTotalAnswerResult = (result: AnswerResultType[]) => {
+        console.log(result);
+        setAnswerResults((prev) => {
+            const newMap = new Map(prev);
+            newMap.set(currentQuestion!.id, result);
+            return newMap;
+        });
+    };
+
+    const onGameError = (error: string) => {
+        toast.current?.show({
+            severity: "error",
+            summary: "Error",
+            detail: error,
+            life: 3000,
+        });
+    };
+
+    const onGemaData = (data: GameData) => {
+        setGameData(data);
+    };
+
+    useEffect(() => {
+        adimnSocket.connect();
+        adimnSocket.on("connect", onConnect);
+        adimnSocket.on("getGameToken", onGetGameToken);
+        adimnSocket.on("newPlayer", onNewPlayer);
+        adimnSocket.on("timeLeft", onLeftTime);
+        adimnSocket.on("currentQuestion", onCurrentQuestion);
+        adimnSocket.on("totalAnswersResults", onTotalAnswerResult);
+        adimnSocket.on("gameError", onGameError);
+        adimnSocket.on("gameData", onGemaData);
+
+        return () => {
+            adimnSocket.off("connect", onConnect);
+            adimnSocket.off("getGameToken", onGetGameToken);
+            adimnSocket.off("newPlayer", onNewPlayer);
+            adimnSocket.off("timeLeft", onLeftTime);
+            adimnSocket.off("currentQuestion", onCurrentQuestion);
+            adimnSocket.off("totalAnswersResults", onTotalAnswerResult);
+            adimnSocket.off("gameError", onGameError);
+            adimnSocket.off("gameData", onGemaData);
+            adimnSocket.disconnect();
+        };
+    }, []);
 
     console.log(`${CLIENT_URL}/live/game/${gameToken}`);
-    if(!gameData) return <ProgressSpinner className='m-5' />
+    if (!gameData) return <ProgressSpinner className='m-5' />
 
     return (
         <div className='flex h-full flex-column justify-content-start align-items-center bg-purple-800'>
@@ -138,14 +146,14 @@ export default function OnlineGameAdmin() {
                 </div>
             }
 
-      {!gameStarted && (
-        <Button
-          label="Start Game"
-          icon="pi pi-play"
-          className=""
-          onClick={() => adimnSocket.emit("startGame", gameToken)}
-        />
-      )}
+            {!gameStarted && (
+                <Button
+                    label="Start Game"
+                    icon="pi pi-play"
+                    className=""
+                    onClick={() => adimnSocket.emit("startGame", gameToken)}
+                />
+            )}
 
             <div className='w-6'>
                 {currentQuestion &&
@@ -156,15 +164,15 @@ export default function OnlineGameAdmin() {
                 }
             </div>
 
-      {plyersScore.length > 0 && (
-        <DataTable value={plyersScore}>
-          <Column field="playerName" header="Player Name"></Column>
-          <Column field="score" header="Score"></Column>
-        </DataTable>
-      )}
+            {plyersScore.length > 0 && (
+                <DataTable value={plyersScore}>
+                    <Column field="playerName" header="Player Name"></Column>
+                    <Column field="score" header="Score"></Column>
+                </DataTable>
+            )}
 
-      {players && <Players players={players} />}
-      <Toast ref={toast} />
-    </div>
-  );
+            {players && <Players players={players} />}
+            <Toast ref={toast} />
+        </div>
+    );
 }

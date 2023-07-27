@@ -109,7 +109,7 @@ function QuizEditor() {
   const loadQuiz = (quiz: QuizType) => {
     setName(quiz.name);
     setDescription(quiz.description);
-    setImage(quiz.image);
+    setImage(quiz.image ?? "");
     const questionsFromServer = quiz.questions
       ?.map((q): EdibleQuestionType => {
         return {
@@ -280,8 +280,8 @@ function QuizEditor() {
   return (
     <div className="flex flex-column justify-content-center align-items-center">
       <Toast ref={toast} />
-      <div className='text-4xl text-purple-200 font-bold mb-3'>Edit
-        {<span className="text-white font-italic"> {quizQuery.data?.name} </span>} Quiz</div>
+      <div className='text-4xl text-purple-600 font-bold mb-3'>Edit
+        {<span className=" font-italic text-purple-400"> {quizQuery.data?.name} </span>} Quiz</div>
       <div className="gap-3 w-10">
         {questionsDOM}
         <Button

@@ -63,8 +63,9 @@ export default function QuestionOnLiveGame({ question, onSelectedOption, time }:
             </div>
             <div className='card'>
                 <ProgressBar
-                    className='h-2rem'
+                    className=''
                     value={calcProgress()}
+                    showValue={true}
                     displayValueTemplate={timeTemplate} ></ProgressBar>
             </div>
         </div>

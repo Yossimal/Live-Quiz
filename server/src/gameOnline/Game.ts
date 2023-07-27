@@ -11,6 +11,7 @@ export default class Game {
     creator: GameCreator;
     gameStarted: boolean = false;
     private readonly timeBetweenQuestions: number = 10000;
+    private answerResults: AnswerResult[] = [];
     constructor(quiz: QuizType, creator: GameCreator) {
         this.players = [];
         this.quiz = quiz;
@@ -54,6 +55,15 @@ export default class Game {
                 setTimeout(sendTimeLeft, 1000);
             } else {
                 this.questionIndex++;
+                this.players.forEach(player => {
+                    const result = this.answerResults
+                        .find(r => r.playerId === player.id && r.questionId === question.id);
+                    if (result) {
+                        player.socket.emit('answerResult', result);
+                    }
+                });
+                this.creator.socket.emit('totalAnswersResults', this.answerResults
+                    .filter(r => r.questionId === question.id));
                 setTimeout(() => this.nextQuestion(), this.timeBetweenQuestions);
             }
         };
@@ -84,9 +94,8 @@ export default class Game {
             questionId: question.id,
             isRight: correct,
             option: answer,
-            score: correct ? question.time + 1 : 0
+            score: correct ? question.score : 0
         };
-        this.creator.socket.emit('answerResult', result);
-        player.socket.emit('answerResult', result);
+        this.answerResults.push(result);
     }
 }

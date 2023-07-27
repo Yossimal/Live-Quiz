@@ -51,6 +51,7 @@ export default function PlayGame() {
   };
 
   const onAnswerResult = (result: AnswerResultType) => {
+    console.log('reslut', result);
     toast.current?.show({
       severity: result.isRight ? "success" : "error",
       summary: result.isRight ? "Correct" : "Wrong",
