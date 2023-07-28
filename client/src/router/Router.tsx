@@ -12,25 +12,10 @@ import JoinGame from "../pages/Play/JoinGame/JoinGame";
 import PlayGame from "../pages/Play/PlayGame/PlayGame";
 import ResetPasswordRequest from "../pages/ResetPasswordRequest/ResetPasswordRequest";
 import ResetPassword from "../pages/ResetPassword/ResetPassword";
-import { useState } from "react";
 import 'primereact/resources/themes/tailwind-light/theme.css'
 import UserProfile from "../pages/PlayerProfile/UserProfile";
 
 export default function Router() {
-  const [theme, _] = useState("");
-
-  // useEffect(() => {
-  //   if (pathname === "/" || pathname === "/login" || pathname === "/signup") {
-  //     import('primereact/resources/themes/tailwind-light/theme.css').then(() => {
-  //       setTheme("tailwind-light");
-  //     });
-  //   } else {
-  //     import('primereact/resources/themes/mdc-dark-deeppurple/theme.css').then(() => {
-  //       setTheme("mdc-dark-deeppurple");
-  //     });
-  //   }
-  // }, [pathname]);
-
   return (
     <Routes>
       <Route path="/" element={<Login />} />
