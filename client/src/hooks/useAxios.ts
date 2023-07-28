@@ -12,7 +12,7 @@ export function useAxios(): { instance: AxiosInstance | null } {
 
   const instance = axios.create({
     baseURL: `${SERVER_URL}/api/`,
-    timeout: 10000,
+    timeout: 30000,
     headers: {
       Authorization: `Bearer ${user!.accessToken}`,
     },

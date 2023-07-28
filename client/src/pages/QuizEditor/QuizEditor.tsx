@@ -45,7 +45,9 @@ function getQuizUpdateRequest({
   questionsToUpdate,
   questionsToDelete,
 }: GetQuizUpdateRequestProps): SaveQuizRequest {
+  console.log("1", questionsToUpdate)
   const cleanedQuestionsToUpdate = cleanTempIds(questionsToUpdate ?? []);
+  console.log("2", cleanedQuestionsToUpdate)
   const questionsEdible: EdibleQuestionType[] = [
     ...(cleanedQuestionsToUpdate?.filter((q) => q.isChanged) ?? []),
     ...(questionsToDelete?.map((id) => ({
@@ -54,10 +56,11 @@ function getQuizUpdateRequest({
       isChanged: true,
     })) ?? []),
   ];
-
+  console.log("3", questionsEdible)
   const questionsEdibleUnique = questionsEdible.filter(
-    (q, index, self) => self.findIndex((s) => s.id === q.id) === index
+    (q, index, self) => self.findIndex((s) => s.id === q.id) === index|| q.id==undefined
   );
+  console.log("4", questionsEdibleUnique)
 
   const questions: SaveQuestionRequest[] = questionsEdibleUnique.map((q) =>
     removeUndefined({
@@ -77,6 +80,7 @@ function getQuizUpdateRequest({
       isDeleted: q.isDeleted,
     })
   );
+  console.log("5", questions)
   return {
     id,
     name,
