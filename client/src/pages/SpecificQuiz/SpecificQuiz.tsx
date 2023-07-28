@@ -1,9 +1,8 @@
 import { useParams } from "react-router-dom"
 import { useQuery } from "react-query";
 import { useAxios } from "../../hooks/useAxios";
-import { QuizType, QuestionType } from "../../types/dataObjects";
+import { QuizType, } from "../../types/dataObjects";
 import { ProgressBar } from 'primereact/progressbar';
-import Error from "../../components/Error";
 
 
 // function Question({ question }: { question: QuestionType }) {
@@ -16,7 +15,7 @@ export default function SpecificQuiz() {
 
     const { instance } = useAxios();
 
-    const { data, isLoading, isError, error } = useQuery<QuizType>(["quiz", id], async () => {
+    const { data, isLoading, isError } = useQuery<QuizType>(["quiz", id], async () => {
         const { data } = await instance!.get<QuizType>(`/quiz/${id}`);
         return data;
     });

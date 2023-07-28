@@ -1,7 +1,6 @@
 import { toHHMMSS } from "../common/objectsTools";
 import { GameData, QuestionOptionType, QuestionType } from "../types/dataObjects";
 import QuestionOnLiveGame from "./QuestionOnLiveGame";
-import { useEffect, useState } from 'react';
 
 type Props = {
     question: QuestionType;

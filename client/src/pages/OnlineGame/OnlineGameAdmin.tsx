@@ -187,11 +187,11 @@ export default function OnlineGameAdmin() {
     console.log(`${CLIENT_URL}/live/game/${gameToken}`);
     if (!gameData) return <ProgressSpinner className='m-5' />
 
-    const getBestPlayer = () => {
-        const maxScore = Math.max(...plyersScore.map((p) => p.score));
-        const bestPlayer = plyersScore.find((p) => p.score === maxScore);
-        return bestPlayer;
-    }
+    // const getBestPlayer = () => {
+    //     const maxScore = Math.max(...plyersScore.map((p) => p.score));
+    //     const bestPlayer = plyersScore.find((p) => p.score === maxScore);
+    //     return bestPlayer;
+    // }
 
     return (
         <>

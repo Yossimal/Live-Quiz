@@ -1,5 +1,4 @@
 import { Button } from "primereact/button";
-import { QuestionOptionType } from "../../types/dataObjects";
 import QuestionOption from "./QuestionOption";
 import { randomNumberIdNeg } from "../../common/uniqueGen";
 
