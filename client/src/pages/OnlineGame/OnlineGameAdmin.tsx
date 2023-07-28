@@ -21,6 +21,7 @@ import { CLIENT_URL } from "../../common/consts";
 import { ProgressSpinner } from "primereact/progressspinner";
 import { Dialog } from "primereact/dialog";
 
+
 export default function OnlineGameAdmin() {
     const { id } = useParams<{ id: string }>();
     const toast = useRef<Toast>(null);
@@ -194,6 +195,10 @@ export default function OnlineGameAdmin() {
 
     return (
         <>
+            <audio autoPlay loop>
+                <source src='/background_music.mp3' />
+            </audio>
+
             <Dialog
                 draggable={false}
                 header="Game Over!"
@@ -216,7 +221,7 @@ export default function OnlineGameAdmin() {
             </Dialog>
             <div className='flex  bg-purple-800'>
                 {!gameStarted && <div className="flex flex-column align-items-center justify-content-center">
-                    <div className='text-center text-6xl text-blue-100 font-bold mb-3'>Scaen To Join To The
+                    <div className='text-center text-6xl text-blue-100 font-bold mb-3'>Scan To Join To The
                         {<span className='text-purple-100 text-6xl font-bold mb-3 font-italic'> {gameData.name}</span>} Quiz:</div>
                     <Tooltip target=".qrcode" mouseTrack mouseTrackLeft={10} />
                     <QRCode
