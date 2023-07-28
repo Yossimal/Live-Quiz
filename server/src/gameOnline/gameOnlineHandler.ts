@@ -32,7 +32,7 @@ export default function gameOnlinHandler(socket: MySocket) {
         games.set(game.gameToken, game);
     });
 
-    socket.on('startGame', token => {
+    socket.on('startGame', async token => {
         const game = games.get(token);
         if (!game) {
             socket.emit('gameError', 'game not found');
@@ -43,7 +43,7 @@ export default function gameOnlinHandler(socket: MySocket) {
             return;
         }
         console.log('startGame', game.quiz.name);
-        game.startGame();
+        await game.startGame();
     });
 
     socket.on('getGameData', token => {
@@ -107,11 +107,18 @@ async function getQuiz(quizId: number, socket: MySocket) {
         include: {
             questions: {
                 include: {
-                    options: true,
+                    options: {
+                        where: {
+                            isDeleted: false
+                        }
+                    },
                     media: true
                 },
                 orderBy: {
                     index: 'asc'
+                },
+                where: {
+                    isDeleted: false
                 }
             }
         }

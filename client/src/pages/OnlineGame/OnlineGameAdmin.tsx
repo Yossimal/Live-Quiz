@@ -19,6 +19,7 @@ import { useSession } from "../../hooks/useSession";
 import { Column } from "primereact/column";
 import { CLIENT_URL } from "../../common/consts";
 import { ProgressSpinner } from "primereact/progressspinner";
+import { Dialog } from "primereact/dialog";
 
 export default function OnlineGameAdmin() {
     const { id } = useParams<{ id: string }>();
@@ -32,6 +33,7 @@ export default function OnlineGameAdmin() {
     );
     const [answerResults, setAnswerResults] = useState<Map<number, AnswerResultType[]>>(new Map());
     const [plyersScore, setPlyersScore] = useState<{ playerName: string; score: number }[]>([]);
+    const [isGameOver, setIsGameOver] = useState<boolean>(false);
 
     const [gameData, setGameData] = useSession<GameData | null>(
         "gameData",
@@ -111,6 +113,15 @@ export default function OnlineGameAdmin() {
         setGameData(data);
     };
 
+    const onGameOver = () => {
+        setIsGameOver(true);
+        setPlyersScore((prev) => {
+            const newScore = [...prev];
+            newScore.sort((a, b) => b.score - a.score);
+            return newScore;
+        });
+    }
+
     useEffect(() => {
         adimnSocket.on("currentQuestion", onCurrentQuestion);
         return () => {
@@ -154,6 +165,13 @@ export default function OnlineGameAdmin() {
     }, [players]);
 
     useEffect(() => {
+        adimnSocket.on('gameOver', onGameOver);
+        return () => {
+            adimnSocket.off('gameOver', onGameOver);
+        }
+    }, [isGameOver]);
+
+    useEffect(() => {
         adimnSocket.connect();
         adimnSocket.on("connect", onConnect);
         adimnSocket.on("gameError", onGameError);
@@ -168,54 +186,78 @@ export default function OnlineGameAdmin() {
     console.log(`${CLIENT_URL}/live/game/${gameToken}`);
     if (!gameData) return <ProgressSpinner className='m-5' />
 
+    const getBestPlayer = () => {
+        const maxScore = Math.max(...plyersScore.map((p) => p.score));
+        const bestPlayer = plyersScore.find((p) => p.score === maxScore);
+        return bestPlayer;
+    }
+
     return (
-        <div className='flex  bg-purple-800'>
-            <div className="flex flex-column justify-content-center align-items-center">
-                {!gameStarted &&
-                    <div className='m-3 flex flex-column justify-content-center align-items-center'>
-                        <div className='text-6xl text-blue-100 font-bold mb-3'>Scaen To Join To The
-                            {<span className='text-purple-100 text-6xl font-bold mb-3'> {gameData.name}</span>} Quiz:</div>
-                        <Tooltip target=".qrcode" mouseTrack mouseTrackLeft={10} />
-                        <QRCode
-                            data-pr-tooltip={`${CLIENT_URL}/live/game/${gameToken}`}
-                            className='qrcode surface-200 shadow-8 m-4'
-                            value={`${CLIENT_URL}/live/game/${gameToken}`} />
+        <>
+            <Dialog
+                draggable={false}
+                header="Game Over!"
+                visible={isGameOver}
+                position="top"
+
+                style={{ width: "50vw" }}
+                onHide={() => setIsGameOver(false)}
+                footer={
+                    <div>
+                        <Button label="Ok" onClick={() => setIsGameOver(false)} />
                     </div>
                 }
+            >
+                <div className='flex flex-column justify-content-center align-items-center'>
+                    <div className='text-6xl text-purple-300 font-bold mb-3'>Game Over</div>
+                    <div className='text-6xl text-purple-700 font-bold mb-3'>Winner: {plyersScore[0]?.playerName}</div>
+                    <div className='text-6xl text-yellow-200 font-bold mb-3'>Score: {plyersScore[0]?.score}</div>
+                </div>
+            </Dialog>
+            <div className='flex  bg-purple-800'>
+                {!gameStarted && <div className="flex flex-column align-items-center justify-content-center">
+                    <div className='text-center text-6xl text-blue-100 font-bold mb-3'>Scaen To Join To The
+                        {<span className='text-purple-100 text-6xl font-bold mb-3 font-italic'> {gameData.name}</span>} Quiz:</div>
+                    <Tooltip target=".qrcode" mouseTrack mouseTrackLeft={10} />
+                    <QRCode
+                        data-pr-tooltip={`${CLIENT_URL}/live/game/${gameToken}`}
+                        className='qrcode surface-200 shadow-8 m-4'
+                        value={`${CLIENT_URL}/live/game/${gameToken}`} />
+                    <p>{`${CLIENT_URL}/live/game/${gameToken}`}</p>
 
-                {!gameStarted && (
                     <Button
                         label="Start Game"
                         icon="pi pi-play"
                         className=""
                         onClick={() => adimnSocket.emit("startGame", gameToken)}
                     />
-                )}
 
-                {players && !gameStarted &&
-                    <Players players={players} />}
-                <Toast ref={toast} />
+                    {players &&
+                        <Players players={players} />}
+                    <Toast ref={toast} />
+                </div>}
+
+                <div className='m-2 flex-auto'>
+                    {currentQuestion &&
+                        <LiveGame
+                            gameData={gameData}
+                            question={currentQuestion}
+                            time={timeLeft} />
+                    }
+                </div>
+
+                <div className='m-2 flex-auto'>
+                    {gameStarted && (
+                        <DataTable value={plyersScore}>
+                            <Column field="playerName" header="Player Name"></Column>
+                            <Column field="score" header="Score"></Column>
+                        </DataTable>
+
+                    )}
+                </div>
             </div>
-
-            <div className='m-2 flex-auto'>
-                {currentQuestion &&
-                    <LiveGame
-                        gameData={gameData}
-                        question={currentQuestion}
-                        time={timeLeft} />
-                }
-            </div>
-
-            <div className='m-2 flex-auto'>
-                {gameStarted && (
-                    <DataTable value={plyersScore}>
-                        <Column field="playerName" header="Player Name"></Column>
-                        <Column field="score" header="Score"></Column>
-                    </DataTable>
-
-                )}
-            </div>
-
-        </div>
+        </>
     );
 }
+
+

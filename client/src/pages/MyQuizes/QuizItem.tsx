@@ -75,7 +75,7 @@ export default function QuizItem({ quiz }: QuizItemProps) {
               <span className="flex align-items-center gap-2">
                 <i className="pi pi-user"></i>
                 <span className="font-semibold">
-                  {quiz._count?.onlineGames || 0} Plays
+                  {quiz._count?.onlineQuizzes || 0} Plays
                 </span>
               </span>
               <div className="flex align-items-center gap-3">

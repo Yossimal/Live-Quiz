@@ -1,6 +1,11 @@
 import { scryptSync, randomUUID } from 'crypto';
 import { PlayerInGame, QuizType, GameCreator, AnswerResult } from './types';
 import { io } from '../server'
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
+
+
 
 
 export default class Game {
@@ -33,14 +38,14 @@ export default class Game {
         player.socket.emit('playerJoined', playerDto);
     }
 
-    startGame() {
+    async startGame() {
         this.gameStarted = true;
-        this.nextQuestion();
+        await this.nextQuestion();
     }
 
-    private nextQuestion() {
+    private async nextQuestion() {
         if (this.questionIndex >= this.quiz.questions.length) {
-            this.gameOver();
+            await this.gameOver();
             return;
         }
 
@@ -66,7 +71,8 @@ export default class Game {
                 console.log('total', total);
                 console.log('creator soc', this.creator.socket.id)
                 this.creator.socket.emit('totalAnswersResults', total);
-                setTimeout(() => this.nextQuestion(), this.timeBetweenQuestions);
+                setTimeout(async () => await this.nextQuestion(),
+                    this.timeBetweenQuestions);
             }
         };
 
@@ -74,9 +80,15 @@ export default class Game {
         sendTimeLeft();
     }
 
-    gameOver() {
+    async gameOver() {
         console.log('gameOver');
         io.to(this.gameToken).emit('gameOver');
+
+        const onlineQuiz = await prisma.onlineQuiz.create({
+            data: {
+                quizId: this.quiz.id,
+            }
+        });
 
         this.creator.socket.disconnect();
         this.players.forEach(player => {

@@ -60,7 +60,7 @@ export type QuizType = {
   updatedAt: Date;
   _count?: {
     questions: number;
-    onlineGames: number;
+    onlineQuizzes: number;
   };
 };
 
