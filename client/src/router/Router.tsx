@@ -12,14 +12,12 @@ import JoinGame from "../pages/Play/JoinGame/JoinGame";
 import PlayGame from "../pages/Play/PlayGame/PlayGame";
 import ResetPasswordRequest from "../pages/ResetPasswordRequest/ResetPasswordRequest";
 import ResetPassword from "../pages/ResetPassword/ResetPassword";
-import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useState } from "react";
 import 'primereact/resources/themes/tailwind-light/theme.css'
 import UserProfile from "../pages/PlayerProfile/UserProfile";
 
 export default function Router() {
-  const { pathname } = useLocation();
-  const [theme, setTheme] = useState("");
+  const [theme, _] = useState("");
 
   // useEffect(() => {
   //   if (pathname === "/" || pathname === "/login" || pathname === "/signup") {
