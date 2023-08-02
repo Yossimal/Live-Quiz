@@ -6,6 +6,7 @@ import {
     QuestionType,
     AnswerResultType,
     GameData,
+    PlayerInGameType
 } from "../../types/dataObjects";
 import { adimnSocket } from "../../common/sockets";
 import { Button } from "primereact/button";
@@ -19,7 +20,7 @@ import { useSession } from "../../hooks/useSession";
 import { Column } from "primereact/column";
 import { CLIENT_URL } from "../../common/consts";
 import { ProgressSpinner } from "primereact/progressspinner";
-import { Dialog } from "primereact/dialog";
+import GameOverDialog from "./GameOverDialog";
 
 
 export default function OnlineGameAdmin() {
@@ -33,7 +34,7 @@ export default function OnlineGameAdmin() {
         null
     );
     const [answerResults, setAnswerResults] = useState<Map<number, AnswerResultType[]>>(new Map());
-    const [plyersScore, setPlyersScore] = useState<{ playerName: string; score: number }[]>([]);
+    const [plyersScore, setPlyersScore] = useState<PlayerInGameType[]>([]);
     const [isGameOver, setIsGameOver] = useState<boolean>(false);
 
     const [gameData, setGameData] = useSession<GameData | null>(
@@ -170,7 +171,7 @@ export default function OnlineGameAdmin() {
         return () => {
             adimnSocket.off('gameOver', onGameOver);
         }
-    }, [isGameOver]);
+    }, [isGameOver, plyersScore]);
 
     useEffect(() => {
         adimnSocket.connect();
@@ -184,14 +185,7 @@ export default function OnlineGameAdmin() {
         };
     }, []);
 
-    console.log(`${CLIENT_URL}/live/game/${gameToken}`);
-    if (!gameData) return <ProgressSpinner className='m-5' />
-
-    const getBestPlayer = () => {
-        const maxScore = Math.max(...plyersScore.map((p) => p.score));
-        const bestPlayer = plyersScore.find((p) => p.score === maxScore);
-        return bestPlayer;
-    }
+    if (!gameData) return <ProgressSpinner className='m-5' />;
 
     return (
         <>
@@ -199,26 +193,8 @@ export default function OnlineGameAdmin() {
                 <source src='/background_music.mp3' />
             </audio>
 
-            <Dialog
-                draggable={false}
-                header="Game Over!"
-                visible={isGameOver}
-                position="top"
+            <GameOverDialog isShow={isGameOver} winner={plyersScore[0]} />
 
-                style={{ width: "50vw" }}
-                onHide={() => setIsGameOver(false)}
-                footer={
-                    <div>
-                        <Button label="Ok" onClick={() => setIsGameOver(false)} />
-                    </div>
-                }
-            >
-                <div className='flex flex-column justify-content-center align-items-center'>
-                    <div className='text-6xl text-purple-300 font-bold mb-3'>Game Over</div>
-                    <div className='text-6xl text-purple-700 font-bold mb-3'>Winner: {plyersScore[0]?.playerName}</div>
-                    <div className='text-6xl text-yellow-200 font-bold mb-3'>Score: {plyersScore[0]?.score}</div>
-                </div>
-            </Dialog>
             <div className='flex  bg-purple-800'>
                 {!gameStarted && <div className="flex flex-column align-items-center justify-content-center">
                     <div className='text-center text-6xl text-blue-100 font-bold mb-3'>Scan To Join To The

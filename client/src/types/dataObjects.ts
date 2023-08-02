@@ -79,6 +79,11 @@ export type OnlineGameType = {
   players?: PlayerType[];
 };
 
+export type PlayerInGameType = {
+  playerName: string;
+  score: number
+}
+
 export type PlayerType = {
   id: string;
   score: number;

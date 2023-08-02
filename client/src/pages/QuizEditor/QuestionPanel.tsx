@@ -1,10 +1,10 @@
 import { Panel, PanelHeaderTemplateOptions } from "primereact/panel";
-import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { Toolbar } from "primereact/toolbar";
 import NumberInput from "./NumberInput";
 import QuestionOptionList from "./QuestionOptionList";
 import { Divider } from "primereact/divider";
+import { InputTextarea } from "primereact/inputtextarea";
 
 type QuestionPanelProps = {
   questionState: PartialState<EdibleQuestionType>;
@@ -126,15 +126,15 @@ export default function QuestionPanel({
       moveUp={() => moveUp(question.id)}
       moveDown={() => moveDown(question.id)}
     />
-};
+  };
 
   return (
     <Panel className="surface mb-2 shadow-3 border-round" headerTemplate={headerTemplate} collapsed toggleable>
       <div className="flex flex-column gap-2">
         <div className="flex flex-column gap-2 align-items-center justify-content-center ">
-          <div className="flex align-items-center w-full justify-content-start gap-3 align-self-start">
+          <div className="flex align-items-start w-full justify-content-start gap-3 align-self-start">
             <label htmlFor="question">Question:</label>
-            <InputText
+            <InputTextarea
               id="question"
               className='w-full'
               value={question.question}

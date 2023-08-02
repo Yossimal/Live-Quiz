@@ -66,7 +66,7 @@ export default function QuizItem({ quiz }: QuizItemProps) {
 
   return (
     <>
-      <div className="col-12">
+      <div className="col-12 surface-100 shadow-1 m-1">
         <div className="flex flex-column lg:flex-row lg:align-items-center p-4 lg:gap-2">
           {imageDOM}
           <div className="flex flex-column sm:flex-row justify-content-between align-items-center lg:align-items-start flex-1 gap-2">
