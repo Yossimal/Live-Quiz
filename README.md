@@ -1,10 +1,6 @@
 # Live Quiz Application
 
-The Live Quiz application allows users to create and customize quizzes, and share them with multiple participants through a QR code or a shareable link. It features a secure login system with JWT authentication and email verification during signup. Additionally, the application supports a "Forgot Password" process that sends email templates to the user. The online quiz communication is made fast and efficient through the implementation of Socket.IO.
-
-* Login system with **_JWT_** Authentication and email verification on singup
-* Forgot password process with email templetes sending to the user
-* Fast communication in the online quiz with **_socket.io_**
+The Live Quiz application allows users to create and customize quizzes, and share them with multiple participants through a QR code or a shareable link. It features a secure login system with **_JWT_** authentication and email verification during signup. Additionally, the application supports a "Forgot Password" process that sends email templates to the user. The online quiz communication is made fast and efficient with **_socket.io_**.
 
 ### Technologies Used
 > #### Server side:
