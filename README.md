@@ -16,19 +16,24 @@ The Live Quiz application allows users to create and customize quizzes, and shar
 > *  **_Email Templates:_** Created using vanilla HTML, CSS, and JavaScript to provide consistent and visually appealing email communications.
 
 #### Screenshot:
+![image](https://github.com/Yossimal/Live-Quiz/assets/40955004/f1615b2e-7bde-4156-b7f8-7ead9110ef66)
 
-![image](https://github.com/Yossimal/FullStackProject7/assets/40955004/2ac62ef5-d838-4e5b-a444-2c3975545904)
+![image](https://github.com/Yossimal/Live-Quiz/assets/40955004/cc720d2a-3157-4a45-8570-ddd982a268fc)
 
-![image](https://github.com/Yossimal/FullStackProject7/assets/40955004/74b05aab-6e8f-4f52-9bbf-5b83c81ab5f2)
+![image](https://github.com/Yossimal/Live-Quiz/assets/40955004/ade1bf07-1654-47ea-aaa2-98359bee4e5f)
 
-![image](https://github.com/Yossimal/FullStackProject7/assets/40955004/58eca193-8d4a-4377-b18b-c65be7c37e39)
+![image](https://github.com/Yossimal/Live-Quiz/assets/40955004/fcbbd3e9-2a0d-4651-a0a8-fb999338ae3e)
 
-![image](https://github.com/Yossimal/FullStackProject7/assets/40955004/e71bf1bb-5212-4b7c-a440-1d1e9515094e)
+![image](https://github.com/Yossimal/Live-Quiz/assets/40955004/dec6ce2f-343d-43aa-b1b1-cf7db38d85e4)
+
+
 
 ### In mobile:
-![photo_2023-08-02_17-45-18](https://github.com/Yossimal/FullStackProject7/assets/40955004/e95ff382-b433-468c-ad3c-102c689008aa)
 
-![image](https://github.com/Yossimal/FullStackProject7/assets/40955004/2e7070c3-baaf-435a-9093-51d43d994c86)
+<img width="400px"   src="https://github.com/Yossimal/Live-Quiz/assets/40955004/47bf11d7-9570-495b-bcac-204908a91f6c"/>
+<img width="400px"   src="https://github.com/Yossimal/Live-Quiz/assets/40955004/e6c27da0-9f5f-4ebf-b697-08a9fe81c4cf"/>
+  
+
 
 
 
